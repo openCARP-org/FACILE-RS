@@ -71,26 +71,22 @@ While the scripts can be run manually, they are designed to be used within [GitL
 
 Research software development is a fundamental aspect of academic research [@anzt2021sustainable],
 and it has now been acknowledged that the FAIR principles (Findable, Accessible, Interoperable,
-Reusable [@wilkinson2016fair]), historically established to improve the reusability of research data, should also be applied to research software.
-Due to some specificities of software compared to research data, like executability or evolution over time, these guidelines had to be adapted to the particular case of scientific software, and the FAIR principles for Research Software (FAIR4RS) have been introduced [@ChueHong2021FAIR].
+Reusable [@wilkinson2016fair]), historically established to improve the reusability of research data, should also be applied to research software. However, specific aspects of research software like executability or evolution over time require these guidelines to be adapted. Therefore, the FAIR principles for Research Software (FAIR4RS) have been introduced [@ChueHong2021FAIR].
 
-In particular, reproducible research requires that software and associated metadata are easily findable by both machines and humans, and retrievable via standardised communication protocols.
+In particular, reproducible research requires software and associated metadata to be easily findable by both machines and humans, and retrievable via standardised communication protocols.
 In this context, several metadata standards are widely used across the scientific community:
 
 * The Citation File Format (CFF) [@Druskat2021CFF] is a human- and machine-readable format that indicates how to cite software.
 * The DataCite Metadata Schema [@DataCite2021] consists of core metadata properties selected for accurate and consistent identification of research outputs for citation and retrieval purposes, with instructions for recommended use.
 * CodeMeta [@jones2017codemeta], an extension of [Schema.org](https://schema.org/), is a JSON and XML metadata schema for scientific software that aims to standardize the exchange of software metadata across repositories and organizations. In particular, it provides mappings between metadata fields used by a large range of software registries and package managers.
 
-All of these standards serve specific purposes, and several are required to cover the whole software lifecycle.
-However, maintaining multiple metadata files in different formats can be a significant burden for research software developers, and an obstacle to the adoption of good software publication practices.
-In addition, as the content of the different metadata files is largely overlapping, maintaining these files manually can pose a risk to data consistency.
+All of these standards serve specific purposes, and several are required to cover the whole software lifecycle. However, maintaining multiple metadata files in different formats can be a significant burden for research software developers, and an obstacle to the adoption of good software publication practices. In addition, as the content of the different metadata files is largely overlapping, maintaining these files manually can pose a risk to data consistency.
 
-Another requirement for FAIR scholarly software is that all software releases are published according to the FAIR4RS principles and assigned a persistent identifier, which can be tedious and prone to errors without an automated process.
+Another requirement for FAIR scholarly software is that all software releases are published according to the FAIR4RS principles, and assigned a persistent identifier. This can be tedious and prone to errors without an automated process.
 
-Along with other initiatives such as the HERMES project [@druskat2022software], FACILE-RS aims to overcome these difficulties by making it easy to create and maintain the metadata associated to research software, as well as to publish software releases according to the FAIR principles on reputable research data repositories.
+Along with other initiatives such as the HERMES project [@druskat2022software], FACILE-RS aims to overcome these difficulties by making it easy to create and maintain the metadata associated to research software, as well as to publish software releases according to the FAIR4RS principles on reputable research data repositories.
 
-FACILE-RS has already been integrated in several research software projects such as the openCARP electrophysiology simulator [@openCARP2024v15; @PLANK2021106223], the 3D visualizer meshalyzer [@Vigmond2023meshalyzer]  and 
-DIVAID [@Goetz2023DIVAID], a tool to divide clinically important regions in bi-atrial geometries.
+FACILE-RS has already been integrated in several research software projects such as the openCARP electrophysiology simulator [@openCARP2024v15; @PLANK2021106223], the 3D visualizer meshalyzer [@Vigmond2023meshalyzer]  and DIVAID [@Goetz2023DIVAID], a tool to divide clinically important regions in bi-atrial geometries.
 
 # Functionality
 
@@ -126,9 +122,7 @@ The Python scripts that compose FACILE-RS are detailed in \autoref{tab:cluster}.
 
 A typical GitLab CI/CD workflow for FACILE-RS is illustrated in \autoref{fig:facile-rs-workflow}. In this example, each time a commit is published, the different metadata files are automatically updated from the CodeMeta file.
 
-This workflow also includes an automated process for creating software releases, both on GitLab and on the research repository RADAR, which is triggered by creating a _pre-release_ tag (e.g. tag `pre-v0.1.0` for triggering the pipelines to create the release of `v0.1.0`).
-During the _pre-release_ phase, a DOI is reserved on RADAR and the software metadata associated with the release is updated.
-Once this is done, the proper release tag as well as the GitLab and RADAR releases are created automatically.
+This workflow also includes an automated process for creating software releases, both on GitLab and on the research repository RADAR, which is triggered by creating a _pre-release_ tag (e.g. tag `pre-v0.1.0` for triggering the pipelines to create release `v0.1.0`). During the _pre-release_ phase, a DOI is reserved on RADAR and the software metadata associated with the release is updated. Then, the proper release tag as well as the GitLab and RADAR releases are created automatically.
 
 For more information on the implementation of such workflows, we refer to [the tutorials](https://git.opencarp.org/openCARP/FACILE-RS/-/tree/master/docs/tutorials) provided in the FACILE-RS repository.
 
