@@ -1,0 +1,7 @@
+sphinx
+myst-parser
+sphinx-autodoc2
+sphinx-pyproject
+sphinx-argparse
+python-dotenv
+setuptools

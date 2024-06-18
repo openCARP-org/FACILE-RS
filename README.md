@@ -41,16 +41,15 @@ If you don't want to trigger releases on RADAR, you can deactivate the RADAR job
 
 ## Documentation
 
-The API documentation in HTML format is available at https://git.opencarp.org/openCARP/facile-rs-doc.
+[![Documentation Status](https://readthedocs.org/projects/facile-rs/badge/?version=latest)](https://facile-rs.readthedocs.io/en/latest/?badge=latest)
+
+The API documentation is available at https://facile-rs.readthedocs.io/.
 
 It can also be generated using Sphinx from [docs/sphinxdocs](./docs/sphinxdocs) by running:
 ```
 make html
 ```
-The following Python packages are required to generate the documentation:
-```
-sphinx myst-parser sphinx-autodoc2 sphinx-pyproject sphinx-argparse
-```
+The Python packages in [docs/sphinxdocs/requirements.txt](./docs/sphinxdocs/requirements.txt) as well as FACILE-RS itself must be installed to generate the documentation.
 
 ## Usage
 

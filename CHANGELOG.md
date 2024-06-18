@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Create pytest test suite for metadata conversion
 - Add CI job for pytest
 - Support 'funder' keyword in CodeMeta
+- Auto-generated documentation using Sphinx
 
 ### Fixed
 - Fix prefix replacements in strings in CFF conversion

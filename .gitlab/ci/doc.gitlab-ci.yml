@@ -2,7 +2,7 @@ build-doc:
   stage: build
   image: python:3.11
   before_script:
-  - pip install sphinx myst-parser sphinx-autodoc2 sphinx-pyproject sphinx-argparse python-dotenv setuptools
+  - pip install -r docs/sphinxdocs/requirements.txt
   # argparse extension of Sphinx needs the FACILE-RS dependencies to be installed.
   - pip install .
   script:
@@ -11,26 +11,3 @@ build-doc:
   artifacts:
     paths:
     - docs/sphinxdocs/build/html
-
-release-doc:
-  stage: release
-  image: python:3.11
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  before_script:
-  - git config --global user.name "${GITLAB_USER_NAME}"
-  - git config --global user.email "${GITLAB_USER_EMAIL}"
-  script:
-  # Change to submodule's directory
-  - cd docs/sphinxdocs/html_doc
-  # Switch to or create relevant branch in submodule
-  - git switch $CI_COMMIT_BRANCH 2>/dev/null || git switch -c $CI_COMMIT_BRANCH
-  # Copy HTML documentation exported as artifact in build-doc job
-  - cp -r ../build/html/* .
-  - git add .
-  - git diff-index --quiet HEAD || git commit -m "Update docs"
-  - git push "https://PUSH_TOKEN:${PUSH_TOKEN_DOC}@git.opencarp.org/openCARP/FACILE-RS-doc.git" "HEAD:$CI_COMMIT_BRANCH"
-  - cd ..
-  - git add html_doc
-  - git diff-index --quiet HEAD || git commit -m "Update doc submodule"
-  - git push "https://PUSH_TOKEN:${PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}" "HEAD:${CI_COMMIT_BRANCH}"
