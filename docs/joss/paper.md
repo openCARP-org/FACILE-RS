@@ -8,30 +8,30 @@ authors:
   - given-names: Marie
     surname: Houillon
     orcid: 0000-0002-6584-0233
-    affiliation: 1
+    affiliation: '1'
   - given-names: Jochen
     surname: Klar
     orcid: 0000-0002-5883-4273
-    affiliation: 2
+    affiliation: '2'
   - given-names: Ziad
     surname: Boutanios
-    affiliation: 1
+    affiliation: '1'
   - given-names: Tomas
     surname: Stary
     orcid: 0000-0001-9614-6263
-    affiliation: 1
+    affiliation: '1'
   - given-names: Terry
     surname: Cojean
     orcid: 0000-0002-1560-921X
-    affiliation: 1,3
+    affiliation: '1,3'
   - given-names: Hartwig
     surname: Anzt
     orcid: 0000-0003-2177-952X
-    affiliation: 1,3
+    affiliation: '1,3'
   - given-names: Axel
     surname: Loewe
     orcid: 0000-0002-2487-4744
-    affiliation: 1  
+    affiliation: '1'  
 affiliations:
  - name: Karlsruhe Institute of Technology, Germany
    index: 1
