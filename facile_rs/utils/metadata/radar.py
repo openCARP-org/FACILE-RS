@@ -30,6 +30,16 @@ class RadarMetadata:
     }
 
     def __init__(self, data, responsible_email, publication_backlink):
+        """
+        Initialize the RadarMetadata object from CodeMeta metadata.
+
+        :param data: CodeMeta metadata, typically the data attribute of a CodemetaMetadata instance.
+        :type data: dict
+        :param responsible_email: email address of the contact person
+        :type responsible_email: str
+        :param publication_backlink: URL to the publication
+        :type publication_backlink: str
+        """
         self.data = data
         self.responsible_email = responsible_email
         self.publication_backlink = publication_backlink
@@ -41,7 +51,11 @@ class RadarMetadata:
         return '_'.join([s.upper() for s in re.findall('([A-Z][a-z]+)', string)])
 
     def as_dict(self):
-        # prepare radar payload
+        """
+        Prepare RADAR payload to be passed to the RADAR API.
+
+        :return: RADAR metadata dictionary
+        """
         archive_date = datetime.utcnow()
 
         radar_dict = {

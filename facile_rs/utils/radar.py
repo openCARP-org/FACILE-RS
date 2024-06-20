@@ -6,6 +6,17 @@ logger = logging.getLogger(__file__)
 
 
 def fetch_radar_token(radar_url, client_id, client_secret, redirect_url, username, password):
+    """
+    Fetch RADAR token using the RADAR API.
+
+    :param radar_url: URL to the RADAR repository
+    :param client_id: RADAR client ID
+    :param client_secret: RADAR client secret
+    :param redirect_url: RADAR redirect URL
+    :param username: RADAR username
+    :param password: RADAR password
+    :return: RADAR token for the given user
+    """
     url = radar_url + '/radar/api/tokens'
     try:
         response = requests.post(url, json={
@@ -28,6 +39,15 @@ def fetch_radar_token(radar_url, client_id, client_secret, redirect_url, usernam
 
 
 def create_radar_dataset(radar_url, workspace_id, headers, radar_dict):
+    """
+    Create a dataset in the given RADAR workspace, using the token provided in headers.
+
+    :param radar_url: URL to the RADAR repository
+    :param workspace_id: RADAR workspace ID
+    :param headers: request headers. Typically the RADAR token, as returned by fetch_radar_token
+    :param radar_dict: RADAR metadata dictionary, as returned by RadarMetadata.as_dict()
+    :return: RADAR dataset ID
+    """
     url = radar_url + f'/radar/api/workspaces/{workspace_id}/datasets'
     try:
         response = requests.post(url, headers=headers, json=radar_dict)
@@ -40,6 +60,15 @@ def create_radar_dataset(radar_url, workspace_id, headers, radar_dict):
 
 
 def prepare_radar_dataset(radar_url, dataset_id, headers):
+    """"
+    Prepare a dataset for review in RADAR.
+
+    :param radar_url: URL to the RADAR repository
+    :param dataset_id: RADAR dataset ID
+    :param headers: request headers. Typically the RADAR token, as returned by fetch_radar_token
+    :return: RADAR response to the request
+    """
+
     review_url = radar_url + f'/radar/api/datasets/{dataset_id}/startreview'
     try:
         response = requests.post(review_url, headers=headers)
@@ -58,6 +87,15 @@ def prepare_radar_dataset(radar_url, dataset_id, headers):
 
 
 def update_radar_dataset(radar_url, dataset_id, headers, radar_dict):
+    """
+    Update a dataset's metadata in the given RADAR workspace.
+    
+    :param radar_url: URL to the RADAR repository
+    :param dataset_id: RADAR dataset ID
+    :param headers: request headers. Typically the RADAR token, as returned by fetch_radar_token
+    :param radar_dict: RADAR metadata dictionary, as returned by RadarMetadata.as_dict()
+    :return: RADAR dataset ID
+    """
     url = radar_url + f'/radar/api/datasets/{dataset_id}'
     try:
         response = requests.put(url, headers=headers, json=radar_dict)
@@ -70,6 +108,16 @@ def update_radar_dataset(radar_url, dataset_id, headers, radar_dict):
 
 
 def upload_radar_assets(radar_url, dataset_id, headers, assets, path):
+    """
+    Upload assets to a RADAR dataset.
+
+    :param radar_url: URL to the RADAR repository
+    :param dataset_id: RADAR dataset ID
+    :param headers: request headers. Typically the RADAR token, as returned by fetch_radar_token
+    :param assets: locations of assets to upload
+    :type assets: list
+    :param path: location where the assets are collected before upload
+    """
     url = radar_url + f'/radar-ingest/upload/{dataset_id}/file'
     for location in assets:
         target = path / location.split('/')[-1]

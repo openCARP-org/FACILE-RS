@@ -11,6 +11,13 @@ logger = logging.getLogger(__file__)
 
 
 def fetch_files(locations, path):
+    """Fetch files from local locations or a URLs and save them at the given path.  
+    
+    :param locations: list of URL or paths to the files
+    :type location: list of str
+    :param path: location where the files should be saved
+    :type path: str
+    """
     for location in locations:
         target = path / location.split('/')[-1]
 
@@ -59,6 +66,13 @@ def fetch_dict(location):
 
 
 def fetch_json(location):
+    """
+    Fetch JSON data from the given location.
+
+    :param location: URL to the JSON data
+    :type location: str
+    :return: JSON-encoded response
+    """
     response = requests.get(location, headers={'Accept': 'application/json'})
     response.raise_for_status()
     return response.json()

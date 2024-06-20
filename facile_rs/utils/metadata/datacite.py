@@ -9,6 +9,10 @@ logger = logging.getLogger(__file__)
 
 class DataciteMetadata:
 
+    """
+    DataCite metadata generator.
+    """
+
     doi_prefix = 'https://doi.org/'
     orcid_prefix = 'https://orcid.org/'
     ror_prefix = 'https://ror.org/'
@@ -19,6 +23,11 @@ class DataciteMetadata:
     }
 
     def __init__(self, data):
+        """
+        Initialize the metadata generator with CodeMeta metadata dictionary.
+
+        :param data: CodeMeta metadata dictionary, typically the data attribute of a CodemetaMetadata object.
+        """
         self.stream = io.StringIO()
         self.xml = XMLGenerator(self.stream, 'utf-8')
 
@@ -26,6 +35,11 @@ class DataciteMetadata:
         logger.debug('data = %s', self.data)
 
     def to_xml(self):
+        """
+        Generate the DataCite XML metadata.
+
+        :return: DataCite metadata in XML format.
+        """
         self.render_document()
 
         dom = parseString(self.stream.getvalue())
@@ -34,12 +48,25 @@ class DataciteMetadata:
         return xml
 
     def render_node(self, tag, args={}, text=None):
+        """
+        Render a single XML node in self.xml .
+
+        :param tag: XML tag name.
+        :type tag: str
+        :param args: XML tag attributes.
+        :type args: dict
+        :param text: XML tag text content.
+        :type text: str
+        """
         self.xml.startElement(tag, {k: v for k, v in args.items() if v is not None})
         if text:
             self.xml.characters(str(text))
         self.xml.endElement(tag)
 
     def render_document(self):
+        """
+        Render the whole DataCite XML document in self.xml .
+        """
         self.xml.startDocument()
         self.xml.startElement('resource', {
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
