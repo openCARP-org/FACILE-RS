@@ -201,6 +201,8 @@ class DataciteMetadata:
                                 'schemeURI': 'http://orcid.org'
                             }, contributor['@id'].replace(self.orcid_prefix, ''))
 
+                    if isinstance(contributor.get('affiliation', {}), dict):
+                        contributor['affiliation'] = [contributor.get('affiliation', {})]
                     for affiliation in contributor.get('affiliation', []):
                         affiliation_attrs = {}
 
@@ -280,7 +282,7 @@ class DataciteMetadata:
                 'descriptionType': 'Abstract'
             }, self.data['description'])
             self.xml.endElement('descriptions')
-        
+
         self.render_funding_references()
 
         self.xml.endElement('resource')
@@ -289,7 +291,7 @@ class DataciteMetadata:
     def render_funding_references(self):
         """DataCite XML rendering of funding references.
         See https://datacite-metadata-schema.readthedocs.io/en/4.5/properties/fundingreference/.
-        
+
         According to the CodeMeta standard:
         - 'funder' is a (list of) Organization or Person (identical as schema.org).
         - 'funding' is a (list of) Text describing the funding grants.
@@ -300,8 +302,8 @@ class DataciteMetadata:
         if 'funder' not in self.data and 'funding' not in self.data:
             return
 
-        self.xml.startElement('fundingReferences', {})            
-        
+        self.xml.startElement('fundingReferences', {})
+
         # Create one funding reference per funder
         if 'funder' in self.data:
             funders = self.data['funder']
@@ -318,7 +320,7 @@ class DataciteMetadata:
                         'schemeURI': 'https://ror.org'
                     }, funder['@id'])
                 self.xml.endElement('fundingReference')
-            
+
         # Create one funding reference per funding
         if 'funding' in self.data:
             fundings = self.data['funding']
@@ -330,7 +332,7 @@ class DataciteMetadata:
                 if isinstance(funding, str):
                     # Field funderName is mandatory
                     self.render_node('funderName', {}, funding)
-                else:                
+                else:
                     if 'funder' in funding:
                         if 'name' in funding['funder']:
                             self.render_node('funderName', {}, funding['funder']['name'])
@@ -346,6 +348,5 @@ class DataciteMetadata:
                     if 'name' in funding:
                         self.render_node('awardTitle', {}, funding['name'])
                 self.xml.endElement('fundingReference')
-        
-        self.xml.endElement('fundingReferences')
 
+        self.xml.endElement('fundingReferences')

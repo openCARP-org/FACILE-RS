@@ -21,7 +21,7 @@ class CffMetadata:
 
     def __init__(self, data):
         """Initialization from a CodeMeta metadata dictionary.
-        
+
         :param data: data attribute of a class:CodemetaMetadata instance
         :type data: dict
         """
@@ -30,7 +30,7 @@ class CffMetadata:
 
     def to_yaml(self):
         """Convert metadata to CFF format.
-        
+
         :return: Content of the CFF file
         :rtype: str
         """
@@ -110,7 +110,7 @@ class CffMetadata:
             if '@id' in self.data['referencePublication'] and \
                     self.data['referencePublication']['@id'].startswith(self.doi_prefix):
                 cff_json['preferred-citation']['doi'] = \
-                    self.data['referencePublication']['@id'] = self.data['referencePublication']['@id'].replace(self.doi_prefix, '')
+                    self.data['referencePublication']['@id'].replace(self.doi_prefix, '')
 
             if 'name' in self.data['referencePublication']:
                 cff_json['preferred-citation']['title'] = self.data['referencePublication']['name']
@@ -153,7 +153,7 @@ class CffMetadata:
 
         # Case when identifier follows https://schema.org/identifier schema
         if 'identifier' in self.data and isinstance(self.data['identifier'], dict):
-            cff_json['identifiers'] = [schema_org_identifier_to_cff(identifier, cff_json)]
+            cff_json['identifiers'] = [schema_org_identifier_to_cff(self.data['identifier'], cff_json)]
         elif 'identifier' in self.data and isinstance(self.data['identifier'], list):
             cff_json['identifiers'] = []
             for identifier in self.data['identifier']:

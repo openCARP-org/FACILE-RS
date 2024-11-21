@@ -1,14 +1,13 @@
-# How to set up FACILE-RS for a two-step release process and archival on RADAR
+# How to set up FACILE-RS for a two-step release process and archival on Zenodo
 
 ## Overview
 This HowTo will guide you through
  * setting up the GitLab CI environment for your project
  * establishing a release process based on pre-release tags
- * archiving your release on a RADAR repository
+ * archiving your release on a Zenodo repository
 
 ## Prepare your codemeta file
-You'll need your metadata prepared in a [codemeta.json](https://codemeta.github.io/create/) file. If you used [KIT's cookiecutter template](https://git.scc.kit.edu/ak-open-source-software/cookiecutter-kittemplate), you should be good to go already.
-
+You'll need your metadata prepared in a [codemeta.json](https://codemeta.github.io/create/) file. If you used [KIT's cookiecutter template](https://gitlab.kit.edu/kit/fair-rs/public/cookiecutter-kittemplate), you should be good to go already.
 
 ## GitLab Continuous Integration environment
 1. You need access to a GitLab Runner that can run Docker containers. If your project is hosted on [the Helmholtz Codebase GitLab instance](https://codebase.helmholtz.cloud/), you will have access to a suitable shared runner. If your project is hosted on GitLab.com, you have access to free runners for a certain amount of minutes per month. If not, see [the GitLab docs](https://docs.gitlab.com/runner/install/) for general information on how to set up your own GitLab runner.
@@ -17,15 +16,7 @@ In general, FACILE-RS should also be compatible with GitHub Actions. We did not 
 2. In your GitLab project, go to `Settings` -> `Access Tokens` and create a token with name `release`, role `Maintainer`, scopes `api` and `write_repository`. Copy this token to a safe place, we'll need it in the next step.
 3. In your GitLab project, go to `Settings` -> `CI/CD`. Create the following variables which you can all [protect and mask](https://docs.gitlab.com/ee/ci/variables/#add-a-cicd-variable-to-a-project) to keep them safe:
   * `PRIVATE_TOKEN` with the value being the token created in step 2: this variable name will be recognized and used in the script `create_release`, and the token will be used to push changes to the repository.
-  * `RADAR_BACKLINK` with the value being a link to a web page of your project's releases, e.g. `https://git.opencarp.org/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/-/releases`
-  * `RADAR_REDIRECT_URL` with the value being a link to a web page of your project or repository, e.g. `https://git.opencarp.org/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/`
-  * `RADAR_EMAIL` with the value being the mail address of the data steward for this dataset
-  * `RADAR_WORKSPACE_ID` with the value being the ID of your RADAR workspace (see the URL to your workspace with the . followed by the name of your workspace)
-  * `RADAR_URL` with the value being the URL to your RADAR instance (talk to your RADAR admin)
-  * `RADAR_CLIENT_ID` with the value being your RADAR API client ID (talk to your RADAR admin)
-  * `RADAR_CLIENT_SECRET` with the value being your RADAR API secret (talk to your RADAR admin)
-  * `RADAR_USERNAME` with the value being your RADAR API user name (talk to your RADAR admin)
-  * `RADAR_PASSWORD` with the value being your RADAR API password (talk to your RADAR admin)
+  * `ZENODO_TOKEN`: a Zenodo personal access token with scope `deposit:write` (can be created on Zenodo in My Account > Applications)
 
 4. Protect the tags triggering the release process so that they can access the protected variables.
 Go to `Settings` -> `Repository` -> `Protected tags` and add the following entries:
@@ -36,12 +27,12 @@ Go to `Settings` -> `Repository` -> `Protected tags` and add the following entri
 You can find a minimum template for a two-stage release process below. There are a number of variables that should/can be adapted:
   * `PROJECT_NAME` where you replace `openCARP` with for example the name of your software
   * `RELEASE_DESCRIPTION` where you adapt the search term and can add as many additional release info as desired, see for example [here](https://git.opencarp.org/openCARP/openCARP/-/releases)
-  * `CREATORS_LOCATIONS` and `CONTRIBUTORS_LOCATIONS` (the latter being data curators) with paths or links to raw codemeta.json files. They can also be lists of those links (starting with `|` and then one link per line) or empty.
+  * `CREATORS_LOCATIONS` and `CONTRIBUTORS_LOCATIONS` (optional, the latter being data curators) with paths or links to raw `codemeta.json` files. They can also be lists of those links (starting with `|` and then one link per line) or empty.
   * If you want to inform the data steward about the new release ready to be published, set the following variables:
-    * `NOTIFICATION_EMAIL: abc@host.com` address of the data steward (can be the same as `RADAR_EMAIL`)
+    * `NOTIFICATION_EMAIL: abc@host.com` address of the data steward
     * `SMTP_SERVER: your.smtpserver.com` (a SMTP server not requiring authentication, e.g. `smarthost.kit.edu`)
   * Commented content in the code below can be uncommented in order to include all submodules in the archived release. If your repository doesn't include submodules, this content can be removed.
-  * You can add further artifacts to be included in the archive by simply adding additional arguments to the `create_release` call in the the `release-create` pipeline.
+  * You can add further artifacts to be included in the archive by simply adding additional arguments to the `facile-rs gitlab publish` call in the the `release-create` pipeline.
 
 ```
 stages:
@@ -51,22 +42,24 @@ stages:
 
 variables:
   PROJECT_NAME: openCARP
-  RADAR_PATH: ${PROJECT_NAME}-${CI_COMMIT_TAG}
-  RADAR_BACKLINK: ${CI_PROJECT_URL}/-/releases
-  SMTP_SERVER: smarthost.kit.edu
-  NOTIFICATION_EMAIL: info@openCARP.org
+  ZENODO_PATH: ${PROJECT_NAME}-${CI_COMMIT_TAG}
+  # Zenodo test instance. Replace with https://zenodo.org to publish on Zenodo.
+  ZENODO_URL: https://sandbox.zenodo.org
+  SMTP_SERVER: example.smtpserver.com
+  NOTIFICATION_EMAIL: datacurator@example.com
   RELEASE_TAG: ${CI_COMMIT_TAG}
   RELEASE_API_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases
   RELEASE_ARCHIVE_URL: ${CI_PROJECT_URL}/-/archive/${CI_COMMIT_TAG}/${PROJECT_NAME}-${CI_COMMIT_TAG}.tar.gz
   RELEASE_DESCRIPTION: |
-    Find the archived version of the release in the [RADAR4KIT repository](https://radar.kit.edu/radar/en/search?query=${PROJECT_NAME}+%28${CI_COMMIT_TAG}%29&searchBy=metadata).
-  CREATORS_LOCATIONS: ${CI_PROJECT_URL}/raw/master/codemeta.json
-  CONTRIBUTORS_LOCATIONS: https://git.opencarp.org/openCARP/openCARP-CDE/raw/master/codemeta.json
+    Find the archived version of the release on [Zenodo](https://zenodo.org/search?q=${PROJECT_NAME}+%28${CI_COMMIT_TAG}%29).
+  # CREATORS_LOCATIONS: ${CI_PROJECT_URL}/raw/master/codemeta.json
+  # CONTRIBUTORS_LOCATIONS: https://git.opencarp.org/openCARP/openCARP-CDE/raw/master/codemeta.json
   CODEMETA_LOCATION: codemeta.json
   CFF_PATH: CITATION.cff
   DATACITE_PATH: ${PROJECT_NAME}.xml
   DATACITE_RELEASE: ${PROJECT_NAME}-${CI_COMMIT_TAG}.xml
   DATACITE_REGISTRY_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PROJECT_NAME}-datacite/${CI_COMMIT_TAG}
+  FACILE_RS_REPO: https://git.opencarp.org/openCARP/FACILE-RS.git
   GIT_SUBMODULE_STRATEGY: recursive
   DOCKER_DRIVER: overlay
   GIT_STRATEGY: clone
@@ -77,7 +70,7 @@ variables:
 
 build-datacite:
   stage: build
-  image: python:3.9
+  image: python:3.11
   before_script:
   - pip install FACILE-RS
   script:
@@ -118,7 +111,7 @@ release-datacite:
 
 release-create:
   stage: release
-  image: python:3.9
+  image: python:3.11
   rules:
   - if: $CI_COMMIT_TAG =~ /^v/
   before_script:
@@ -132,7 +125,7 @@ release-create:
   #  ${INCLSUBMODULES_REGISTRY_URL}/${INCLSUBMODULES_RELEASE}
 
 prepare-release:
-  image: python:3.9
+  image: python:3.11
   stage: release
   rules:
   - if: $CI_COMMIT_TAG =~ /^pre/
@@ -143,8 +136,9 @@ prepare-release:
   script:
   - VERSION=`echo $CI_COMMIT_TAG | grep -oP '^pre-\K.*$'`
   - echo "Preparing release of $VERSION"
-  - facile-rs release prepare
-  - facile-rs radar prepare
+  - facile-rs release prepare --version=$VERSION
+  - echo "preparing Zenodo release, make sure the Zenodo token is defined as gitlab CI/CD variables"
+  - facile-rs zenodo prepare
   - facile-rs cff create
   - git add ${CODEMETA_LOCATION} ${CFF_PATH}
   - git commit -m "Release ${VERSION}"
@@ -152,16 +146,16 @@ prepare-release:
   - git tag $VERSION
   - git push "https://PUSH_TOKEN:${PRIVATE_TOKEN}@${CI_REPOSITORY_URL#*@}" --tags
 
-archive-radar:
+archive-zenodo:
   stage: archive
-  image: python:3.9
+  image: python:3.11
   rules:
   - if: $CI_COMMIT_TAG =~ /^v/
   before_script:
   - pip install FACILE-RS
   script:
   - >
-    facile-rs radar upload --no-sort-authors
+    facile-rs zenodo upload --no-sort-authors
     $RELEASE_ARCHIVE_URL
   #  ${INCLSUBMODULES_REGISTRY_URL}/${INCLSUBMODULES_RELEASE}
 ```
@@ -182,5 +176,5 @@ Then, the prepare-release pipeline will run and
 * update your `codemeta.json` with the new version, its date and DOI
 * create the tag `vX.Y`
 * not delete the tag `pre-vX.Y` as protected tags can only be deleted from the web interface
-* upload your dataset to RADAR
-* notify the data steward by email that the release is ready to be published on RADAR
+* upload your dataset to Zenodo
+* notify the data steward by email that the release is ready to be published on Zenodo

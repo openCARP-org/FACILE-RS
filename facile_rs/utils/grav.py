@@ -10,7 +10,7 @@ logger = logging.getLogger(__file__)
 def collect_pages(grav_path, pipeline_name):
     """
     Collect pages in a GRAV repository which are associated with the given pipeline name.
-    
+
     :param grav_path: path to the GRAV repository
     :type grav_path: string representing a path segment, or an object implementing the os.PathLike interface
     :param pipeline_name: name of the pipeline

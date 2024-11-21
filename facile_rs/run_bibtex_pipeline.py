@@ -26,7 +26,7 @@ from pathlib import Path
 import frontmatter
 import pypandoc
 
-from .utils import settings
+from .utils import cli, settings
 from .utils.grav import collect_pages
 
 logger = logging.getLogger(__file__)
@@ -38,8 +38,8 @@ nocite: '@*'
 '''
 
 
-def create_parser():
-    parser = argparse.ArgumentParser()
+def create_parser(add_help=True):
+    parser = argparse.ArgumentParser(add_help=add_help)
 
     parser.add_argument('--grav-path', dest='grav_path',
                         help='Path to the grav repository directory.')
@@ -81,5 +81,9 @@ def main():
         open(page_path, 'w').write(frontmatter.dumps(page))
 
 
+def main_deprecated():
+    cli.cli_call_deprecated(main)
+
+
 if __name__ == "__main__":
-    main()
+    main_deprecated()

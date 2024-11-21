@@ -2,9 +2,9 @@ build-datacite:
   stage: build
   image: python:3.11
   before_script:
-  - pip install git+https://git.opencarp.org/openCARP/FACILE-RS.git
+  - pip install git+${FACILE_RS_REPO}
   script:
-  - create_datacite
+  - facile-rs datacite create
   artifacts:
     paths:
     - $DATACITE_PATH

@@ -34,12 +34,12 @@ Example usage
 import argparse
 from pathlib import Path
 
-from .utils import settings
+from .utils import cli, settings
 from .utils.metadata import CffMetadata, CodemetaMetadata
 
 
-def create_parser():
-    parser = argparse.ArgumentParser()
+def create_parser(add_help=True):
+    parser = argparse.ArgumentParser(add_help=add_help)
 
     parser.add_argument('--codemeta-location', dest='codemeta_location',
                         help='Locations of the main codemeta.json JSON file')
@@ -82,5 +82,9 @@ def main():
         print(cff_yaml)
 
 
+def main_deprecated():
+    cli.cli_call_deprecated(main)
+
+
 if __name__ == "__main__":
-    main()
+    main_deprecated()

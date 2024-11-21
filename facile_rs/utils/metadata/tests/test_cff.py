@@ -1,10 +1,10 @@
+from os import path
+
 import pytest
 import yaml
-from os import path
 
 from facile_rs.utils.metadata import CffMetadata, CodemetaMetadata
 from facile_rs.utils.metadata.cff import schema_org_identifier_to_cff
-
 
 # Get current script location
 SCRIPT_DIR = path.dirname(path.realpath(__file__))
@@ -46,5 +46,5 @@ def test_init(create_metadata):
 def test_conversion(create_metadata):
     _, metadata = create_metadata
     print(metadata.to_yaml())
-    with open(path.join(SCRIPT_DIR, 'cff_ref.yml'), 'r') as f:
+    with open(path.join(SCRIPT_DIR, 'cff_ref.yml')) as f:
         assert yaml.safe_load(metadata.to_yaml()) == yaml.safe_load(f)

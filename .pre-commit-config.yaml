@@ -15,8 +15,13 @@ repos:
     rev: v0.2.2
     hooks:
       - id: ruff
+        exclude: __init__.py
         args: [--fix, --exit-non-zero-on-fix]
   - repo: https://git.opencarp.org/openCARP/FACILE-RS
     rev: v1.5
     hooks:
     - id: create_cff
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.26.0
+    hooks:
+    - id: typos

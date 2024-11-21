@@ -1,6 +1,7 @@
 stages:
 - build
 - test
+- publish-pypi
 - release
 - archive
 
@@ -10,6 +11,7 @@ variables:
   DOCKER_DRIVER: overlay
   GIT_STRATEGY: clone
   GIT_DEPTH: 1
+  FACILE_RS_REPO: https://git.opencarp.org/openCARP/FACILE-RS.git
 
   # DataCite XML
   DATACITE_PATH: ${PROJECT_NAME}.xml
@@ -30,13 +32,24 @@ variables:
   ENABLE_BAGPACK: "true"
   BAG_PATH: ${PROJECT_NAME}-${CI_COMMIT_TAG}
   BAGPACK_REGISTRY_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PROJECT_NAME}-bagpack/${CI_COMMIT_TAG}
+
   # RADAR
   # Set ENABLE_RADAR to "false" to deactivate release on RADAR
   ENABLE_RADAR: "true"
   RADAR_PATH: ${PROJECT_NAME}-${CI_COMMIT_TAG}
   RADAR_BACKLINK: ${CI_PROJECT_URL}/-/releases
+  # Zenodo
+  ENABLE_ZENODO: "false"
+  ZENODO_PATH: ${PROJECT_NAME}-${CI_COMMIT_TAG}
+  ZENODO_URL: https://sandbox.zenodo.org
+  # Notification email configuration
   SMTP_SERVER: smarthost.kit.edu
-  NOTIFICATION_EMAIL: tomas.stary@kit.edu
+  NOTIFICATION_EMAIL: marie.houillon@kit.edu
+
+  # PyPI variables for FACILE-RS
+  ENABLE_PYPI: "true"
+  PYPI_REGISTRY_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
+  PYPI_WHEEL_NAME: ${PROJECT_NAME}-${CI_COMMIT_TAG}-py3-none-any.whl
 
 include:
 - local: .gitlab/ci/checkReadme.gitlab-ci.yml # Example CI job to check for existence of a README.
@@ -47,6 +60,7 @@ include:
 # Generates draft JOSS PDF and exports it as artifact
 - local: .gitlab/ci/joss.gitlab-ci.yml
 - local: .gitlab/ci/doc.gitlab-ci.yml
+- local: .gitlab/ci/pypi.gitlab-ci.yml
 
 default:
   tags:

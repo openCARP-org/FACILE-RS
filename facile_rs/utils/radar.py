@@ -89,7 +89,7 @@ def prepare_radar_dataset(radar_url, dataset_id, headers):
 def update_radar_dataset(radar_url, dataset_id, headers, radar_dict):
     """
     Update a dataset's metadata in the given RADAR workspace.
-    
+
     :param radar_url: URL to the RADAR repository
     :param dataset_id: RADAR dataset ID
     :param headers: request headers. Typically the RADAR token, as returned by fetch_radar_token

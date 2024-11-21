@@ -8,18 +8,18 @@
 
 import pathlib
 import sys
+from importlib.metadata import version as get_version
+
+# 3rd party
+from sphinx_pyproject import SphinxConfig
 
 FACILERS = pathlib.Path(__file__).parents[3]
 sys.path.insert(0, FACILERS.resolve().as_posix())
 
-# 3rd party
-
-from sphinx_pyproject import SphinxConfig
-from facile_rs import __version__ as myproject_version
-
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+myproject_version = get_version("facile-rs")
 config = SphinxConfig("../../../pyproject.toml", globalns=globals(), config_overrides = {"version": myproject_version})
 
 project = config.name

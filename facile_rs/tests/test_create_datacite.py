@@ -1,9 +1,7 @@
-import pytest
 import sys
 from os import path
 
 from facile_rs.create_datacite import main
-
 
 SCRIPT_DIR = path.dirname(path.realpath(__file__))
 METADATA_DIR = path.join(path.dirname(SCRIPT_DIR), 'utils', 'metadata', 'tests')
@@ -24,7 +22,7 @@ def test_cli(monkeypatch, tmpdir):
                             '--datacite-path', str(output_datacite)
                         ])
     main()
-    with open(path.join(SCRIPT_DIR, 'datacite_ref.xml'), 'r') as datacite_ref:
+    with open(path.join(SCRIPT_DIR, 'datacite_ref.xml')) as datacite_ref:
         assert output_datacite.read() == datacite_ref.read()
 
 
@@ -39,5 +37,5 @@ def test_env(monkeypatch, tmpdir):
                             sys.argv[0],
                         ])
     main()
-    with open(path.join(SCRIPT_DIR, 'datacite_ref.xml'), 'r') as datacite_ref:
+    with open(path.join(SCRIPT_DIR, 'datacite_ref.xml')) as datacite_ref:
         assert output_datacite.read() == datacite_ref.read()

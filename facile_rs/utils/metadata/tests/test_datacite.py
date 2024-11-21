@@ -1,11 +1,11 @@
-import pytest
 import io
 from os import path
 from xml.dom.minidom import parseString
 from xml.sax.saxutils import XMLGenerator
 
-from facile_rs.utils.metadata import DataciteMetadata, CodemetaMetadata
+import pytest
 
+from facile_rs.utils.metadata import CodemetaMetadata, DataciteMetadata
 
 # Get current script location
 SCRIPT_DIR = path.dirname(path.realpath(__file__))
@@ -34,13 +34,15 @@ def test_render_node(create_metadata):
     metadata.render_node('name', {'key': 'value', 'other': 'val'}, 'Test text')
     dom = parseString(metadata.stream.getvalue())
     assert dom.toxml() == '<?xml version="1.0" ?><name key="value" other="val">Test text</name>'
-    
+
 
 def test_render_funding_references_codemeta(create_metadata):
     """Test for CodeMeta formatted funding metadata
     """
     _, metadata = create_metadata
-    expected_result = """<?xml version="1.0" ?><fundingReferences><fundingReference><funderName>Karlsruhe Institute of Technology</funderName></fundingReference><fundingReference><funderName>TES_2024_TEST</funderName></fundingReference></fundingReferences>"""
+    expected_result = """<?xml version="1.0" ?><fundingReferences><fundingReference><funderName>Karlsruhe Institute"""\
+        """ of Technology</funderName></fundingReference><fundingReference><funderName>TES_2024_TEST</funderName>"""\
+        """</fundingReference></fundingReferences>"""
     metadata.render_funding_references()
     dom = parseString(metadata.stream.getvalue())
     assert dom.toxml() == expected_result
@@ -50,7 +52,7 @@ def test_render_funding_references_schemaorg(create_metadata_schemaorg):
     """Test for schema.org formatted funding metadata
     """
     _, metadata = create_metadata_schemaorg
-    with open(path.join(SCRIPT_DIR,'datacite_schemaorg_funding_ref.xml'), 'r') as f:
+    with open(path.join(SCRIPT_DIR,'datacite_schemaorg_funding_ref.xml')) as f:
         expected_result = f.read()
     metadata.render_funding_references()
     dom = parseString(metadata.stream.getvalue())
@@ -67,5 +69,5 @@ def test_init(create_metadata):
 
 def test_conversion(create_metadata):
     _, metadata = create_metadata
-    with open(path.join(SCRIPT_DIR, 'datacite_ref.xml'), 'r') as f:
+    with open(path.join(SCRIPT_DIR, 'datacite_ref.xml')) as f:
         assert metadata.to_xml() == f.read()

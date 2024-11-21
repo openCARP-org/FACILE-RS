@@ -1,9 +1,7 @@
 import json
-import pytest
 from os import path
 
 from facile_rs.utils.metadata import CodemetaMetadata
-
 
 # Get current script location
 SCRIPT_DIR = path.dirname(path.realpath(__file__))

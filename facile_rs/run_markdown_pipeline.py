@@ -9,10 +9,13 @@ This script copies the content of markdown files in the PIPELINE_SOURCE to a Gra
 The Grav repository is created by the Git-Sync Plugin.
 
 The pages need to be already existing in Grav and contain a ``pipeline`` and a ``source`` field in their frontmatter.
-The script will find all pages which match the provided PIPELINE and will overwrite content part of the page with the markdown file given by source.
-If source is ``codemeta.json``, the content will be added to the frontmatter entry ``codemeta`` rather than overwriting the page content.
+The script will find all pages which match the provided PIPELINE and will overwrite content part of the page with the
+markdown file given by source.
+If source is ``codemeta.json``, the content will be added to the frontmatter entry ``codemeta`` rather than overwriting
+the page content.
 Twig templates digesting the metadata can be found in the file ``Twig_templates.md`` in this directory.
-After running the script, the changes to the Grav CMS repository can be committed and pushed, and the Git-Sync Plugin will update the public pages.
+After running the script, the changes to the Grav CMS repository can be committed and pushed, and the Git-Sync Plugin
+will update the public pages.
 See openCARP citation info or code of conduct for examples.
 
 Usage
@@ -33,14 +36,14 @@ from pathlib import Path
 import frontmatter
 import yaml
 
-from .utils import settings
+from .utils import cli, settings
 from .utils.grav import collect_pages
 
 logger = logging.getLogger(__file__)
 
 
-def create_parser():
-    parser = argparse.ArgumentParser()
+def create_parser(add_help=True):
+    parser = argparse.ArgumentParser(add_help=add_help)
 
     parser.add_argument('--grav-path', dest='grav_path',
                         help='Path to the grav repository directory.')
@@ -85,5 +88,9 @@ def main():
         page_path.write_text(frontmatter.dumps(page))
 
 
+def main_deprecated():
+    cli.cli_call_deprecated(main)
+
+
 if __name__ == "__main__":
-    main()
+    main_deprecated()

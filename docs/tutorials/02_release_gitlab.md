@@ -10,7 +10,7 @@ In this tutorial, we will assume that you have already implemented the automatic
 
 ### Protect the release tags
 
-In order to prevent the release pipeline from being triggered from other branches than the main one, it is advised to make the Access Token `PUSH_TOKEN` that was created earlier _protected_. This means that this token can only be used in protected branches and tags.
+In order to prevent the release pipeline from being triggered from other branches than the main one, it is advised to make the Access Token `PRIVATE_TOKEN` that was created earlier _protected_. This means that this token can only be used in protected branches and tags.
 
 As a consequence, we need to make the release tags that we will create _protected_, otherwise we won't be able to push to the repository from the CI pipeline triggered from this tag.
 
@@ -39,7 +39,7 @@ include:
 - local: .gitlab/ci/cff.gitlab-ci.yml
 ```
 
-We will now add a stage `release` that will contain the release jobs, abd add some variables that will be used in this jobs.
+We will now add a stage `release` that will contain the release jobs, and add some variables that will be used in this jobs.
 We will also include the configuration file of the release jobs that we will create as `.gitlab/ci/release.gitlab-ci.yml`:
 ```
 stages:
@@ -77,19 +77,19 @@ prepare-release:
   rules:
   - if: $CI_COMMIT_TAG =~ /^pre/
   before_script:
-  - pip install git+https://git.opencarp.org/openCARP/FACILE-RS.git
+  - pip install FACILE-RS
   - git config --global user.name "${GITLAB_USER_NAME}"
   - git config --global user.email "${GITLAB_USER_EMAIL}"
   script:
   - VERSION=`echo $CI_COMMIT_TAG | grep -oP '^pre-\K.*$'`
   - echo "Preparing release of $VERSION"
-  - prepare_release --version=$VERSION
-  - create_cff
+  - facile-rs release prepare --version=$VERSION
+  - facile-rs cff create
   - git add ${CODEMETA_LOCATION} ${CFF_PATH}
   - git commit -m "Release ${VERSION}"
-  - git push "https://PUSH_TOKEN:${PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}" "HEAD:${CI_DEFAULT_BRANCH}"
+  - git push "https://PUSH_TOKEN:${PRIVATE_TOKEN}@${CI_REPOSITORY_URL#*@}" "HEAD:${CI_DEFAULT_BRANCH}"
   - git tag $VERSION
-  - git push "https://PUSH_TOKEN:${PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}" --tags
+  - git push "https://PUSH_TOKEN:${PRIVATE_TOKEN}@${CI_REPOSITORY_URL#*@}" --tags
 
 release-create:
   stage: release
@@ -99,12 +99,12 @@ release-create:
   before_script:
   - git config --global user.name "${GITLAB_USER_NAME}"
   - git config --global user.email "${GITLAB_USER_EMAIL}"
-  - pip install git+https://git.opencarp.org/openCARP/FACILE-RS.git
+  - pip install FACILE-RS
   - export DEBIAN_FRONTEND="noninteractive"
   - apt update
   - apt-get install -y jq
   script:
-  - create_release --release-description "$RELEASE_DESCRIPTION" --private-token "$PUSH_TOKEN"
+  - facile-rs gitlab publish --release-description "$RELEASE_DESCRIPTION" --private-token "$PRIVATE_TOKEN"
 ```
 
 ## Create your first release

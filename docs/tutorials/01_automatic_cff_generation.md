@@ -24,13 +24,13 @@ Save the file `codemeta.json` in your project repository.
 ### Create the token allowing to push on the repository
 
 We first need to create a project token that will allow the CI job to push the generated files to the repository.
-This token will be contained in the CI variable `PUSH_TOKEN`.
+This token will be contained in the CI variable `PRIVATE_TOKEN`.
 
 To do so:
 - From your repository in GitLab, go to Settings -> Access Tokens, then click on "Add New Token".
 - Choose a name for your token, select the role "Maintainer" and the scopes "api" and "write_repository".
 - Create the token and copy its value.
-- Now go to Settings -> CI/CD -> Variables, and add a new variable with key `PUSH_TOKEN`. Use as value the token copied at the step before.
+- Now go to Settings -> CI/CD -> Variables, and add a new variable with key `PRIVATE_TOKEN`. Use as value the token copied at the step before.
 
 > As this variable is a token allowing to push to the repository, make it at least be a masked variable so that it is not displayed in the CI logs.
 > We also advise you to make it protected so that it can only be uses on protected branches and tags.
@@ -76,11 +76,11 @@ create-cff:
     - if: $CI_COMMIT_BRANCH
   script:
   # Install FACILE-RS
-  - pip install git+https://git.opencarp.org/openCARP/FACILE-RS.git
+  - pip install FACILE-RS
   - git config --global user.name "${GITLAB_USER_NAME}"
   - git config --global user.email "${GITLAB_USER_EMAIL}"
-  # See https://git.opencarp.org/openCARP/FACILE-RS#create_cff for more information about this script
-  - create_cff
+  # See https://facile-rs.readthedocs.io/en/latest/apidocs/facile_rs/facile_rs.create_cff.html for more information about this command
+  - facile-rs cff create
   # Ignore the remaining steps if you don't want to push the generated CFF file to the repository
   # To simply visualize the generated CFF file in the CI job logs, you can use:
   #- cat ${CFF_PATH}
@@ -88,7 +88,7 @@ create-cff:
   # Commit only if CFF file has been updated
   - git diff-index --quiet HEAD || git commit -m 'Update CFF file'
   # Push to the repository, but do not trigger CI
-  - git push -o ci.skip "https://PUSH_TOKEN:${PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}" "HEAD:${CI_COMMIT_BRANCH}"
+  - git push -o ci.skip "https://PUSH_TOKEN:${PRIVATE_TOKEN}@${CI_REPOSITORY_URL#*@}" "HEAD:${CI_COMMIT_BRANCH}"
 ```
 
 ### Run the CI pipeline

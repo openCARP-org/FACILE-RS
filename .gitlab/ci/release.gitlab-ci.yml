@@ -6,7 +6,7 @@ release-create:
   before_script:
   - git config --global user.name "${GITLAB_USER_NAME}"
   - git config --global user.email "${GITLAB_USER_EMAIL}"
-  - pip install git+https://git.opencarp.org/openCARP/FACILE-RS.git
+  - pip install git+${FACILE_RS_REPO}
   - export DEBIAN_FRONTEND="noninteractive"
   - apt update
   - apt-get install -y jq
@@ -19,8 +19,15 @@ release-create:
       RELEASE_DESCRIPTION="${RELEASE_DESCRIPTION}<br/>Find the archived version of the ${CI_COMMIT_TAG} release in the RADAR4KIT repository - [doi:${DOI}](${DOI_URL}).";
     fi
   - >
-    create_release --release-description "$RELEASE_DESCRIPTION"
-    ${DATACITE_REGISTRY_URL}/${DATACITE_RELEASE}
+    if [ $ENABLE_PYPI = true ];
+    then
+      create_release --release-description "$RELEASE_DESCRIPTION" \
+      ${DATACITE_REGISTRY_URL}/${DATACITE_RELEASE} \
+      ${PYPI_REGISTRY_URL}/${PYPI_WHEEL_NAME}
+    else
+      create_release --release-description "$RELEASE_DESCRIPTION" \
+      ${DATACITE_REGISTRY_URL}/${DATACITE_RELEASE}
+    fi
 
 prepare-release:
   image: python:3.11
@@ -28,24 +35,32 @@ prepare-release:
   rules:
   - if: $CI_COMMIT_TAG =~ /^pre/
   before_script:
-  - pip install git+https://git.opencarp.org/openCARP/FACILE-RS.git
+  - pip install git+${FACILE_RS_REPO}
   - git config --global user.name "${GITLAB_USER_NAME}"
   - git config --global user.email "${GITLAB_USER_EMAIL}"
   script:
   - VERSION=`echo $CI_COMMIT_TAG | grep -oP '^pre-\K.*$'`
   - echo "Preparing release of $VERSION"
-  - prepare_release --version=$VERSION
+  - facile-rs release prepare --version=$VERSION
   - >
     if [ $ENABLE_RADAR = true ];
     then
         echo "preparing RADAR release, make sure the credentials are defined as gitlab CI/CD variables";
-        prepare_radar;
+        facile-rs radar prepare;
     else
         echo "RADAR skipped, change ENABLE_RADAR in .gitlab-ci.yml if you have the credentials";
     fi
-  - create_cff
+  - >
+    if [ $ENABLE_ZENODO = true ];
+    then
+        echo "preparing Zenodo release, make sure the Zenodo token is defined as gitlab CI/CD variables";
+        facile-rs zenodo prepare;
+    else
+        echo "Zenodo skipped, change ENABLE_ZENODO in .gitlab-ci.yml if you want to do a Zenodo release";
+    fi
+  - facile-rs cff create
   - git add ${CODEMETA_LOCATION} ${CFF_PATH}
   - git commit -m "Release ${VERSION}"
-  - git push "https://PUSH_TOKEN:${PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}" "HEAD:${CI_DEFAULT_BRANCH}"
+  - git push "https://PUSH_TOKEN:${PRIVATE_TOKEN}@${CI_REPOSITORY_URL#*@}" "HEAD:${CI_DEFAULT_BRANCH}"
   - git tag $VERSION
-  - git push "https://PUSH_TOKEN:${PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}" --tags
+  - git push "https://PUSH_TOKEN:${PRIVATE_TOKEN}@${CI_REPOSITORY_URL#*@}" --tags

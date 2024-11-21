@@ -24,13 +24,13 @@ from pathlib import Path
 
 import bagit
 
-from .utils import settings
+from .utils import cli, settings
 from .utils.checksum import get_sha256, get_sha512
 from .utils.http import fetch_dict, fetch_files
 
 
-def create_parser():
-    parser = argparse.ArgumentParser()
+def create_parser(add_help=True):
+    parser = argparse.ArgumentParser(add_help=add_help)
 
     parser.add_argument('assets', nargs='*', default=[],
                         help='Assets to be added to the bag.')
@@ -88,5 +88,9 @@ def main():
         f.write(f'{get_sha512(datacite_path)} metadata/datacite.xml\n')
 
 
+def main_deprecated():
+    cli.cli_call_deprecated(main)
+
+
 if __name__ == "__main__":
-    main()
+    main_deprecated()

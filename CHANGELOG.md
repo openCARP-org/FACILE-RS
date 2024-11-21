@@ -3,6 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Changed
+- Implement global command-line tool `facile-rs` to replace direct call to the different scripts.
+
+## v2.2.0
+
+### Changed
+- Remove variable `PUSH_TOKEN` from CI pipeline, use `PRIVATE_TOKEN` instead.
+
+### Added
+- Add feature for archiving on Zenodo via the scripts `prepare_zenodo.py` and `create_zenodo.py`
+- Workflow for publishing releases on PyPI and integrating the Python wheel to the GitLab release.
+
+### Fixed
+- Consequently remove SPDX URL from RADAR license metadata
+
 ## v2.1.0
 
 ### Added
@@ -45,4 +62,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Added
 - thumbnails in the docstring pipeline are now automatically generated
 - added the CI pipelines
-- intialise the CHANGELOG.md
+- initialise the CHANGELOG.md

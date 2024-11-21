@@ -23,14 +23,13 @@ import logging
 
 import requests
 
-from .utils import settings
-
+from .utils import cli, settings
 
 logger = logging.getLogger(__file__)
 
 
-def create_parser():
-    parser = argparse.ArgumentParser()
+def create_parser(add_help=True):
+    parser = argparse.ArgumentParser(add_help=add_help)
 
     parser.add_argument('assets', nargs='*', default=[],
                         help='Assets to be included in the release.')
@@ -43,7 +42,7 @@ def create_parser():
     parser.add_argument('--private-token', dest='private_token',
                         help='The PRIVATE_TOKEN to be used with the GitLab API.')
     parser.add_argument('--dry', action='store_true',
-                        help='Perform a dry run, do not perfrom the final request.')
+                        help='Perform a dry run, do not perform the final request.')
     parser.add_argument('--log-level', dest='log_level',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
     parser.add_argument('--log-file', dest='log_file',
@@ -92,5 +91,9 @@ def main():
         response.raise_for_status()
 
 
+def main_deprecated():
+    cli.cli_call_deprecated(main)
+
+
 if __name__ == "__main__":
-    main()
+    main_deprecated()

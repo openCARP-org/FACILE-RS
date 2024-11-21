@@ -16,7 +16,7 @@ class CodemetaMetadata:
 
     def fetch(self, location):
         """Update metadata set with data fetched from a CodeMeta file
-        
+
         :param location: URL or path to the CodeMeta JSON file
         :type location: str
         """
