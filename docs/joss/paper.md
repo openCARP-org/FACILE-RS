@@ -61,6 +61,7 @@ In particular, FACILE-RS automates:
 * Creating a [CFF (Citation File Format) file](https://citation-file-format.github.io) from CodeMeta files
 * Creating archive packages in the [BagIt](https://tools.ietf.org/html/rfc8493) or the [BagPack](https://www.rd-alliance.org/system/files/Research%20Data%20Repository%20Interoperability%20WG%20-%20Final%20Recommendations_reviewed_0.pdf) formats
 * Creating a release on the GitLab development platform using the GitLab API
+* Archiving software releases persistently on Zenodo
 * Archiving software releases persistently using the [RADAR service](https://www.radar-service.eu)
 * Using content from Markdown files, BibTeX files, or Python docstrings to create web pages within the [Grav CMS](https://getgrav.org/)
 
@@ -100,25 +101,27 @@ The main prerequisite for using FACILE-RS in a software repository is a CodeMeta
 \hline
 Script & Functionality \\
 \hline
-\texttt{create\_cff}              & generates Citation File Format (CFF) metadata file \\
-\texttt{prepare\_release}         & updates \textit{version} and \textit{dateModified} fields in metadata \\
-\texttt{create\_release}          & creates release in GitLab \\
-\texttt{create\_datacite}         & generates DataCite metadata file \\
-\texttt{create\_bag}              & creates BagIt package \\
-\texttt{create\_bagpack}          & adds DataCite XML to BagIt package \\
-\texttt{prepare\_radar}           & reserves DOI on RADAR \\
-\texttt{create\_radar}            & creates archive and uploads it to RADAR\\
-\texttt{run\_markdown\_pipeline}  & updates Grav CMS website \\
-\texttt{run\_bibtex\_pipeline}    & converts BibTeX files and publishes references on \\
+\texttt{facile-rs cff create}              & generates Citation File Format (CFF) metadata file \\
+\texttt{facile-rs datacite create}         & generates DataCite metadata file \\
+\texttt{facile-rs bag create}              & creates BagIt package \\
+\texttt{facile-rs bagpack create}          & adds DataCite XML to BagIt package \\
+\texttt{facile-rs release prepare}         & updates \textit{version} and \textit{dateModified} fields in metadata \\
+\texttt{facile-rs gitlab publish}          & creates release in GitLab \\
+\texttt{facile-rs radar prepare}           & reserves DOI on RADAR \\
+\texttt{facile-rs radar upload}            & creates archive and uploads it to RADAR\\
+\texttt{facile-rs zenodo prepare}           & reserves DOI on Zenodo \\
+\texttt{facile-rs zenodo upload}            & creates archive and uploads it to Zenodo\\
+\texttt{facile-rs grav markdown}  & updates Grav CMS website \\
+\texttt{facile-rs grav bibtex}    & converts BibTeX files and publishes references on \\
  & Grav CMS website \\
-\texttt{run\_docstring\_pipeline} & extracts docstrings from Python scripts and publishes \\
+\texttt{facile-rs grav docstring} & extracts docstrings from Python scripts and publishes \\
  & them on Grav CMS website \\
 \hline
 \end{tabular}
 \vspace{5mm}
 \end{table}
 
-The Python scripts that compose FACILE-RS are detailed in \autoref{tab:cluster}. While each of these scripts can be used individually and executed manually, FACILE-RS was designed to be used within an automated workflow like [GitLab CI/CD pipelines](https://about.gitlab.com/topics/ci-cd/), used for automating software development workflow via a continuous and iterative process. 
+FACILE-RS scripts can be run using the `facile-rs` command line tool. The available commands are detailed in \autoref{tab:cluster}. While each of these commands can be executed individually and manually, FACILE-RS was designed to be used within an automated workflow like [GitLab CI/CD pipelines](https://about.gitlab.com/topics/ci-cd/), used for automating software development workflow via a continuous and iterative process. 
 
 A typical GitLab CI/CD workflow for FACILE-RS is illustrated in \autoref{fig:facile-rs-workflow}. In this example, each time a commit is published, the different metadata files are automatically updated from the CodeMeta file.
 
