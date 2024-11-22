@@ -14,7 +14,7 @@ def fetch_files(locations, path, headers={}):
     """Fetch files from local locations or a URLs and save them at the given path.
 
     :param locations: list of URL or paths to the files
-    :type location: list of str
+    :type locations: list of str
     :param path: location where the files should be saved
     :type path: str
     """
