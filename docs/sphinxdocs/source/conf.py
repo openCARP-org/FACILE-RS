@@ -63,10 +63,11 @@ modindex_common_prefix = [
   'facile_rs.utils.',
   'facile_rs.utils.metadata.'
   ]
+html_sidebars = { '**': ['localtoc.html', 'globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'] }
 
 
 # These two options don't seem to have any effect
 add_module_names = False
 # python_use_unqualified_type_names = True
 
-html_static_path = ['_static']
+#html_static_path = ['_static']

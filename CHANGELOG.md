@@ -3,10 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## Unreleased
+## v3.0.0
 
 ### Changed
 - Implement global command-line tool `facile-rs` to replace direct call to the different scripts.
+- Documentation files gathered in the ReadTheDocs documentation
+
+### Added
+- Add CI/CD template repository
 
 ## v2.2.0
 

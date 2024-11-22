@@ -12,7 +12,7 @@ This package (previously known as openCARP-CI) contains a set of Python scripts 
 
 The scripts were created for the [openCARP](https://opencarp.org) simulation software, but can be adopted for arbitrary projects. While they can be used on the command line, the scripts are mainly used within the GitLab CI to run automatically on each push to a repository, or when a tag is created.
 
-An example of integration in a CI environment is provided in the [tutorials](./docs/tutorials). An example of a more complex setup are the [openCARP CI file](https://git.opencarp.org/openCARP/openCARP/-/blob/master/.gitlab-ci.yml) and the [included subscripts](https://git.opencarp.org/openCARP/openCARP/-/tree/master/.gitlab/ci).
+An example of integration in a CI environment is provided in the [tutorials](https://facile-rs.readthedocs.io/en/latest/tutorials/). An example of a more complex setup are the [openCARP CI file](https://git.opencarp.org/openCARP/openCARP/-/blob/master/.gitlab-ci.yml) and the [included subscripts](https://git.opencarp.org/openCARP/openCARP/-/tree/master/.gitlab/ci).
 
 
 ## Setup
@@ -42,25 +42,20 @@ pip install FACILE-RS
 
 ### Use FACILE-RS within GitLab CI/CD
 
-In order to automate FACILE-RS workflows, you can adapt the GitLab CI/CD configuration from this repository:
-- Copy `.gitlab-ci.yml` and `.gitlab/` to your project.
-- For the publication in releases you need to add an access token. Go to your repository and then in Settings -> Access Tokens, choose the name of your token, Expiration date (can be removed), role as a Maintainer and Scopes as `api` and `write_repository`. After the token has been created, copy its value and go to your repository, Settings -> CI/CD -> Variables and choose Add Variable. As a key write `PRIVATE_TOKEN` and as value paste the copied token.
-- Deactivate the PyPI release workflow used by FACILE-RS by setting `ENABLE_PYPI` to "false" in  [`.gitlab-ci.yml`](https://git.opencarp.org/openCARP/FACILE-RS/-/blob/master/.gitlab-ci.yml).
-- If you don't want to trigger releases on RADAR, you can deactivate the RADAR jobs by setting `ENABLE_RADAR` to "false" in [`.gitlab-ci.yml`](https://git.opencarp.org/openCARP/FACILE-RS/-/blob/master/.gitlab-ci.yml#L35).
-- If you want to trigger releases on Zenodo, you can set the environment variable `ENABLE_ZENODO` to "true" in [`.gitlab-ci.yml`](https://git.opencarp.org/openCARP/FACILE-RS/-/blob/master/.gitlab-ci.yml#L35).
+In order to integrate automated FACILE-RS workflows into your GitLab project, you can use the FACILE-RS template ([source](https://git.opencarp.org/openCARP/facile-rs-template), [documentation](https://facile-rs.readthedocs.io/en/latest/facile-rs_template.html)), which provides a sample GitLab CI/CD configuration for generating metadata and creating software releases with FACILE-RS.
 
 ## Documentation
 
 [![Documentation Status](https://readthedocs.org/projects/facile-rs/badge/?version=latest)](https://facile-rs.readthedocs.io/en/latest/?badge=latest)
 
-The API documentation is available at https://facile-rs.readthedocs.io/.
+FACILE-RS documentation is available at [https://facile-rs.readthedocs.io/](https://facile-rs.readthedocs.io/).
 
-It can also be generated using Sphinx from [docs/sphinxdocs](./docs/sphinxdocs) by running:
+It can also be generated using Sphinx from [docs/sphinxdocs](https://git.opencarp.org/openCARP/FACILE-RS/-/tree/master/docs/sphinxdocs?ref_type=heads) by running:
 ```
 pip install -r requirements.txt
 make html
 ```
-The Python packages in [docs/sphinxdocs/requirements.txt](./docs/sphinxdocs/requirements.txt) as well as FACILE-RS itself must be installed in order to generate the documentation.
+The Python packages in [docs/sphinxdocs/requirements.txt](https://git.opencarp.org/openCARP/FACILE-RS/-/blob/master/docs/sphinxdocs/requirements.txt?ref_type=heads) as well as FACILE-RS itself must be installed in order to generate the documentation.
 
 ## Usage
 

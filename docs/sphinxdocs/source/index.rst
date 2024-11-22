@@ -1,26 +1,20 @@
-.. FACILE-RS documentation master file, created by
-   sphinx-quickstart on Sat May  4 11:13:06 2024.
-   You can adapt this file completely to your liking,
-   but it should at least contain the root `toctree`
-   directive.
+Documentation homepage
+================================
 
+.. include:: myst_include_readme.md
+   :parser: myst_parser.sphinx_
 
-Welcome to the documentation of FACILE-RS!
-==========================================
-.. doesn't seem to have an effect
-.. currentmodule:: facile_rs
+-------------------
+
+More documentation:
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
 
+   self
+   tutorials/index
+   facile-rs_template
    apidocs/index
 
-.. Indices
-.. =======
-
 * :ref:`Index <genindex>`
-
-.. * :ref:`Module Index <modindex>`
-
-.. * :ref:`search`
+* :ref:`Module Index <modindex>`
