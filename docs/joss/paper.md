@@ -39,7 +39,7 @@ affiliations:
    index: 2
  - name: Technical University of Munich, Germany
    index: 3
-date: 22 November 2024
+date: 25 November 2024
 bibliography: paper.bib
 ---
 
