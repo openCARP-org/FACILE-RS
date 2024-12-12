@@ -1,8 +1,10 @@
-pytest:
+test-install:
   stage: test
-  image: python:3.11
-  before_script:
-  - pip install -e .
-  - pip install pytest
+  image: python:$PYTHON_VERSION
   script:
-  - pytest -v
+    - pip install -e .
+    - pip install pytest
+    - pytest -v
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]

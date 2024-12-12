@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+- Add GitHub Actions template repository
+- Add CI jobs for testing installation and running pytest for all supported Python versions
+
+### Changed
+- Update Pillow version for Python 3.12 and 3.13 to 11.0.0
+
 ## v3.0.0
 
 ### Changed

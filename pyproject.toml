@@ -39,7 +39,8 @@ dependencies = [
     "PyYaml~=5.3.1",
     "requests~=2.23",
     "python-resize-image~=1.1.20",
-    "Pillow~=9.4.0",
+    "Pillow~=9.4.0; python_version <= '3.11'",
+    "Pillow~=11.0; python_version > '3.11'",
     "setuptools",
 ]
 dynamic = ["version"]
