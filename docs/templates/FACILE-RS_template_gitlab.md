@@ -1,4 +1,4 @@
-# FACILE-RS CI/CD template
+# FACILE-RS template for GitLab CI/CD
 
 The [FACILE-RS template](https://git.opencarp.org/openCARP/facile-rs-template) allows you to integrate automated FACILE-RS workflows to a GitLab repository.
 
