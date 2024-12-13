@@ -72,7 +72,11 @@ class CodemetaMetadata:
                 ids = set()
                 names = set()
                 things = []
-                for thing in self.data[key]:
+                if not isinstance(self.data[key], list):
+                    data_list = [self.data[key]]
+                else:
+                    data_list = self.data[key]
+                for thing in data_list:
                     thing_id = thing.get('@id')
                     thing_name = thing.get('name')
                     if thing_id in ids or thing_name in names:
