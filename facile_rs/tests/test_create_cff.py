@@ -39,3 +39,17 @@ def test_env(monkeypatch, tmpdir):
     main()
     with open(path.join(SCRIPT_DIR, 'cff_ref.cff')) as cff_ref:
         assert output_cff.read() == cff_ref.read()
+
+def test_stdout(monkeypatch, capsys):
+    monkeypatch.setattr('sys.argv',
+                        [
+                            sys.argv[0],
+                            '--codemeta-location', CODEMETA_LOCATION,
+                            '--creators-location', CREATORS_LOCATIONS,
+                            '--contributors-location', CONTRIBUTORS_LOCATIONS,
+                        ])
+    main()
+    captured = capsys.readouterr().out
+    with open(path.join(SCRIPT_DIR, 'cff_ref.cff')) as cff_ref:
+        # remove the last newline character added by the print function
+        assert captured[:-1] == cff_ref.read()
