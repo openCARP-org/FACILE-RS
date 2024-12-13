@@ -41,6 +41,7 @@ def test_env(monkeypatch, tmpdir):
         assert output_cff.read() == cff_ref.read()
 
 def test_stdout(monkeypatch, capsys):
+    monkeypatch.unsetenv('CFF_PATH')
     monkeypatch.setattr('sys.argv',
                         [
                             sys.argv[0],
