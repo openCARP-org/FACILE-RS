@@ -53,6 +53,11 @@ dev = [
     "ruff",
     "twine",
 ]
+test = [
+    "pytest",
+    "coverage",
+    "cffconvert",
+]
 
 [project.urls]
 repository = "https://git.opencarp.org/openCARP/FACILE-RS"
@@ -105,3 +110,8 @@ lint.ignore = [
 ]
 
 [tool.sphinx-pyproject]
+
+[tool.coverage.run]
+omit = [
+    "test_*.py",
+]
