@@ -21,6 +21,7 @@ Usage
 """
 
 import argparse
+import json
 import smtplib
 from pathlib import Path
 
@@ -135,6 +136,8 @@ def main():
 
         # upload assets
         upload_radar_assets(settings.RADAR_URL, dataset_id, headers, settings.ASSETS, radar_path)
+    else:
+        print(json.dumps(radar_dict))
 
     if settings.SMTP_SERVER and settings.NOTIFICATION_EMAIL:
         message = """\
