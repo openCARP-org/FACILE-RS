@@ -40,7 +40,10 @@ def test_env(monkeypatch, tmpdir):
     with open(path.join(SCRIPT_DIR, 'datacite_ref.xml')) as datacite_ref:
         assert output_datacite.read() == datacite_ref.read()
 
+
 def test_stdout(monkeypatch, capsys):
+    # Ensure no DATACITE_PATH environment variable is set
+    monkeypatch.delenv('DATACITE_PATH', raising=False)
     monkeypatch.setattr('sys.argv',
                         [
                             sys.argv[0],
