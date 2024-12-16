@@ -61,6 +61,7 @@ def test_env_nodate(monkeypatch, tmp_path):
     monkeypatch.setenv('CODEMETA_LOCATION', str(codemeta_location))
     monkeypatch.setenv('VERSION', RELEASE_TAG)
     monkeypatch.delenv('DATE', raising=False)
+    monkeypatch.setattr('sys.argv', [sys.argv[0]])
     main()
     modified_codemeta = json.loads(codemeta_location.read_text())
     initial_codemeta = json.loads(MINIMAL_CODEMETA)
