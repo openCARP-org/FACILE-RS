@@ -1,6 +1,6 @@
 import pytest
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 def unset_facilers_env(monkeypatch):
     env_vars = [
         'ASSETS',
