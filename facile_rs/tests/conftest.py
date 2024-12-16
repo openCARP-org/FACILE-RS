@@ -2,6 +2,9 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def unset_facilers_env(monkeypatch):
+    """
+    Ensure not to use variables defined in external environment when running tests.
+    """
     env_vars = [
         'ASSETS',
         'BAG_INFO_LOCATION',
