@@ -21,6 +21,7 @@ Usage
 """
 
 import argparse
+import json
 import smtplib
 from pathlib import Path
 
@@ -131,6 +132,9 @@ def main():
             server = smtplib.SMTP(settings.SMTP_SERVER)
             server.sendmail(settings.NOTIFICATION_EMAIL, settings.NOTIFICATION_EMAIL, message)
             server.quit()
+
+    else:
+        print(json.dumps(zenodo_dict))
 
 
 def main_deprecated():
