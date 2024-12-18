@@ -53,7 +53,7 @@ docker run --rm \
 
 # Summary
 
-The FACILE-RS (Findability and Accessibility through Continuous Integration with Less Effort for Research Software) Python package facilitates the archival and long term preservation of research software repositories. It consists of a set of scripts, which simplify the maintenance of software metadata by automating its generation and synchronization in various formats from a single manually maintained metadata file. FACILE-RS also makes it easier to publish and archive software releases according to the Open Science paradigm and the FAIR (Findable, Accessible, Interoperable, Reusable) principles for Research Software by offering tools to automate the creation of releases and the upload to persistent research data repositories.
+The Python package FACILE-RS (Findability and Accessibility through Continuous Integration with Less Effort for Research Software) facilitates the archival and long term preservation of research software repositories. It consists of a set of scripts that simplify the maintenance of software metadata by automating its generation and synchronization in various formats from a single manually maintained metadata file. FACILE-RS also makes it easier to publish and archive software releases according to the Open Science paradigm and the FAIR (Findable, Accessible, Interoperable, Reusable) principles for Research Software by offering tools to automate the creation of releases and the upload to persistent research data repositories.
 
 In particular, FACILE-RS automates:
 
@@ -65,7 +65,7 @@ In particular, FACILE-RS automates:
 * Archiving software releases persistently using the RADAR service [@ijgi5030028]
 * Using content from Markdown files, BibTeX files, or Python docstrings to create web pages within the [Grav CMS](https://getgrav.org/)
 
-While the scripts can be run manually, they are designed to be used within GitLab CI/CD or another workflow automation system to automate the process of maintaining metadata and creating persistent software releases.
+The scripts can be run manually, but they have been designed to be used within GitLab CI/CD or other workflow automation systems, in order to reduce the need for manual intervention for maintaining metadata and creating persistent software releases.
 
 
 # Statement of need
@@ -87,7 +87,7 @@ Another requirement for FAIR scholarly software is that all software releases ar
 
 Some initiatives were taken in order to overcome these difficulties. For instance, the HERMES project [@druskat2022software] allows to create automated workflows to gather metadata from various sources and publish software on repositories based on InvenioRDM (i.e. Zenodo). The metadata conversion utility Bolognese [@fenner2017bolognese] supports many metadata formats including CodeMeta and DataCite.
 
-With FACILE-RS, we aim to provide a tool, which makes it easy to automate both the creation and maintenance of different metadata formats associated to research software, as well as the publication of software releases according to the FAIR4RS principles on reputable research data repositories.
+With FACILE-RS, we aim to provide a tool that makes it easy to automate both the creation and maintenance of different metadata formats associated to research software, as well as the publication of software releases according to the FAIR4RS principles on reputable research data repositories.
 
 FACILE-RS has already been integrated in several research software projects such as the openCARP electrophysiology simulator [@openCARP2024v15; @PLANK2021106223], the 3D visualizer meshalyzer [@Vigmond2023meshalyzer]  and DIVAID [@Goetz2023DIVAID], a tool to divide clinically important regions in bi-atrial geometries.
 
