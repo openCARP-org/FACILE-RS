@@ -10,7 +10,7 @@ This package (previously known as openCARP-CI) contains a set of Python scripts 
 * archive the software on [Zenodo](https://zenodo.org),
 * use content from markdown files, bibtex files, or python docstrings to create web pages in a [Grav CMS](https://getgrav.org/).
 
-The scripts were created for the [openCARP](https://opencarp.org) simulation software, but can be adopted for arbitrary projects. While they can be used on the command line, the scripts are mainly used within the GitLab CI to run automatically on each push to a repository, or when a tag is created.
+The scripts were created for the [openCARP](https://opencarp.org) simulation software, but can be adopted for arbitrary projects. While they can be used on the command line, the scripts are mainly used within the GitLab CI/CD or GitHub Actions to run automatically on each push to a repository, or when a tag is created.
 
 An example of integration in a CI environment is provided in the [tutorials](https://facile-rs.readthedocs.io/en/latest/tutorials/). An example of a more complex setup are the [openCARP CI file](https://git.opencarp.org/openCARP/openCARP/-/blob/master/.gitlab-ci.yml) and the [included subscripts](https://git.opencarp.org/openCARP/openCARP/-/tree/master/.gitlab/ci).
 
@@ -21,9 +21,7 @@ An example of integration in a CI environment is provided in the [tutorials](htt
 
 In order to generate metadata or publish software releases using FACILE-RS, it is necessary to create a CodeMeta metadata file for the software (for example using the [CodeMeta generator](https://codemeta.github.io/codemeta-generator/)).
 
-In addition, if you want to use our preconfigured automated pipelines, your software repository needs to be hosted on a GitLab instance with [Docker runners](https://docs.gitlab.com/runner/) available.
-
-It is technically possible to automate the FACILE-RS workflows on other platforms (for example using GitHub actions), but such examples have not been implemented yet.
+In addition, if you want to use our preconfigured automated pipelines, your software repository needs to be hosted on GitHub, or on a GitLab instance with [Docker runners](https://docs.gitlab.com/runner/) available.
 
 ### Installation
 
@@ -40,9 +38,18 @@ source env/bin/activate
 pip install FACILE-RS
 ```
 
-### Use FACILE-RS within GitLab CI/CD
+### Use FACILE-RS automated workflows
 
-In order to integrate automated FACILE-RS workflows into your GitLab project, you can use the FACILE-RS template ([source](https://git.opencarp.org/openCARP/facile-rs-template), [documentation](https://facile-rs.readthedocs.io/en/latest/facile-rs_template.html)), which provides a sample GitLab CI/CD configuration for generating metadata and creating software releases with FACILE-RS.
+You can integrate automated FACILE-RS workflows in your GitLab or GitHub repository using our templates.
+Each template provides a sample configuration for generating metadata and creating software releases with FACILE-RS.
+
+#### GitLab CI/CD template
+- [source](https://git.opencarp.org/openCARP/facile-rs-template)
+- [documentation](https://facile-rs.readthedocs.io/en/latest/templates/facile-rs_template_gitlab.html)
+
+#### GitHub Actions template
+- [source](https://github.com/openCARP-org/FACILE-RS-template)
+- [documentation](https://facile-rs.readthedocs.io/en/latest/templates/facile-rs_template_github.html)
 
 ## Documentation
 
