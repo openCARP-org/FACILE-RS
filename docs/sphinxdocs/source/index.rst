@@ -13,7 +13,8 @@ More documentation:
 
    self
    tutorials/index
-   facile-rs_template
+   templates/facile-rs_template_gitlab
+   templates/facile-rs_template_github
    apidocs/index
 
 * :ref:`Index <genindex>`

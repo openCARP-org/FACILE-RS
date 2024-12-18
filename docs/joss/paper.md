@@ -65,7 +65,7 @@ In particular, FACILE-RS automates:
 * Archiving software releases persistently using the RADAR service [@ijgi5030028]
 * Using content from Markdown files, BibTeX files, or Python docstrings to create web pages within the [Grav CMS](https://getgrav.org/)
 
-The scripts can be run manually, but they have been designed to be used within GitLab CI/CD or other workflow automation systems, in order to reduce the need for manual intervention for maintaining metadata and creating persistent software releases.
+The scripts can be run manually, but they have been designed to be used within workflow automation systems such as GitLab CI/CD or GitHub Actions, in order to reduce the need for manual intervention when maintaining metadata and creating persistent software releases.
 
 
 # Statement of need
@@ -131,7 +131,8 @@ A typical GitLab CI/CD workflow for FACILE-RS is illustrated in \autoref{fig:fac
 
 This workflow also includes an automated process for creating software releases, both on GitLab and on the research repository RADAR, which is triggered by creating a _pre-release_ tag (e.g. tag `pre-v0.1.0` for triggering the pipelines to create release `v0.1.0`). During the _pre-release_ phase, a DOI is reserved on RADAR and the software metadata associated with the release is updated. Then, the proper release tag as well as the GitLab and RADAR releases are created automatically.
 
-For more information on the implementation of such workflows, we refer to [the tutorials](https://facile-rs.readthedocs.io/en/latest/tutorials/index.html) provided in the FACILE-RS documentation.
+Such workflows can be integrated easily in existing projects by using [the templates](https://facile-rs.readthedocs.io/en/latest/#use-facile-rs-automated-workflows) we provide for GitLab CI/CD or GitHub Actions.
+For more information on the implementation of FACILE-RS automated workflows, we refer to the tutorials provided in the FACILE-RS documentation.
 
 # Conclusion
 
