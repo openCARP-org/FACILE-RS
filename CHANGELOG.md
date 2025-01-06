@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+- Add --assets-token and --assets-token-name arguments for fetching assets from private repositories
+
+### Fixed
+- Fix asset names retrieval in URLs when uploading assets to Zenodo or RADAR
+
 ## v3.1.0
 
 ### Added

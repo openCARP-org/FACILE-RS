@@ -26,6 +26,7 @@ In general, FACILE-RS should also be compatible with GitHub Actions. We did not 
   * `RADAR_CLIENT_SECRET` with the value being your RADAR API secret (talk to your RADAR admin)
   * `RADAR_USERNAME` with the value being your RADAR API user name (talk to your RADAR admin)
   * `RADAR_PASSWORD` with the value being your RADAR API password (talk to your RADAR admin)
+  * If your project is private, you should in addition set the (masked and protected) variable `ASSETS_TOKEN` with the same value as `PRIVATE_TOKEN`: this token will be used by `facile-rs radar upload` to fetch the source code from the repository.
 
 4. Protect the tags triggering the release process so that they can access the protected variables.
 Go to `Settings` -> `Repository` -> `Protected tags` and add the following entries:
@@ -57,7 +58,7 @@ variables:
   NOTIFICATION_EMAIL: info@openCARP.org
   RELEASE_TAG: ${CI_COMMIT_TAG}
   RELEASE_API_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases
-  RELEASE_ARCHIVE_URL: ${CI_PROJECT_URL}/-/archive/${CI_COMMIT_TAG}/${PROJECT_NAME}-${CI_COMMIT_TAG}.tar.gz
+  RELEASE_ARCHIVE_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/archive.tar.gz?sha=${CI_COMMIT_TAG}
   RELEASE_DESCRIPTION: |
     Find the archived version of the release in the [RADAR4KIT repository](https://radar.kit.edu/radar/en/search?query=${PROJECT_NAME}+%28${CI_COMMIT_TAG}%29&searchBy=metadata).
   CREATORS_LOCATIONS: ${CI_PROJECT_URL}/raw/master/codemeta.json
