@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlparse
 
 import requests
 
@@ -100,7 +101,8 @@ def upload_zenodo_assets(zenodo_url, dataset_id, zenodo_token, assets, path):
     }
 
     for location in assets:
-        filename = location.split('/')[-1]
+        parsed_url = urlparse(location)
+        filename = parsed_url.path.split('/')[-1]
         target = path / filename
 
         # Start file upload

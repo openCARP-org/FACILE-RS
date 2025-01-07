@@ -17,6 +17,7 @@ In general, FACILE-RS should also be compatible with GitHub Actions. We did not 
 3. In your GitLab project, go to `Settings` -> `CI/CD`. Create the following variables which you can all [protect and mask](https://docs.gitlab.com/ee/ci/variables/#add-a-cicd-variable-to-a-project) to keep them safe:
   * `PRIVATE_TOKEN` with the value being the token created in step 2: this variable name will be recognized and used in the script `create_release`, and the token will be used to push changes to the repository.
   * `ZENODO_TOKEN`: a Zenodo personal access token with scope `deposit:write` (can be created on Zenodo in My Account > Applications)
+  * If your project is private, you should in addition set the (masked and protected) variable `ASSETS_TOKEN` with the same value as `PRIVATE_TOKEN`: this token will be used by `facile-rs zenodo upload` to fetch the source code from the repository.
 
 4. Protect the tags triggering the release process so that they can access the protected variables.
 Go to `Settings` -> `Repository` -> `Protected tags` and add the following entries:
@@ -49,7 +50,7 @@ variables:
   NOTIFICATION_EMAIL: datacurator@example.com
   RELEASE_TAG: ${CI_COMMIT_TAG}
   RELEASE_API_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases
-  RELEASE_ARCHIVE_URL: ${CI_PROJECT_URL}/-/archive/${CI_COMMIT_TAG}/${PROJECT_NAME}-${CI_COMMIT_TAG}.tar.gz
+  RELEASE_ARCHIVE_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/archive.tar.gz?sha=${CI_COMMIT_TAG}
   RELEASE_DESCRIPTION: |
     Find the archived version of the release on [Zenodo](https://zenodo.org/search?q=${PROJECT_NAME}+%28${CI_COMMIT_TAG}%29).
   # CREATORS_LOCATIONS: ${CI_PROJECT_URL}/raw/master/codemeta.json
