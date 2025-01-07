@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Changed
 - Update Pillow version for Python 3.12 and 3.13 to 11.0.0
 
+### Fixed
+- In `utils/metadata/codemeta.py` : fix bug in `remove_doubles` when author or creator fields contain a single entry of type dict.
+- In `utils/metadata/radar.py` : support case when author/contributor affiliation(s) is not a list.
+
 ## v3.0.0
 
 ### Changed
