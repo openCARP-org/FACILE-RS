@@ -67,6 +67,10 @@ def create_parser(add_help=True):
                         help='SMTP server used to inform about new release. No mail sent if empty.')
     parser.add_argument('--notification-email', dest='notification_email',
                         help='Recipient address to inform about new release. No mail sent if empty.')
+    parser.add_argument('--assets-token', dest='assets_token',
+                        help='Private token, to be used when fetching assets')
+    parser.add_argument('--assets-token-name', dest='assets_token_name',
+                        help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
     parser.add_argument('--dry', action='store_true',
                         help='Perform a dry run, do not upload anything.')
     parser.add_argument('--log-level', dest='log_level',
@@ -120,7 +124,9 @@ def main():
     radar_dict = radar_metadata.as_dict()
 
     # collect assets
-    fetch_files(settings.ASSETS, radar_path)
+    fetch_files(settings.ASSETS, radar_path, headers={
+        settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
+    })
 
     if not settings.DRY:
         # obtain oauth token

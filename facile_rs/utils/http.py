@@ -10,21 +10,21 @@ import yaml
 logger = logging.getLogger(__file__)
 
 
-def fetch_files(locations, path):
+def fetch_files(locations, path, headers={}):
     """Fetch files from local locations or a URLs and save them at the given path.
 
     :param locations: list of URL or paths to the files
-    :type location: list of str
+    :type locations: list of str
     :param path: location where the files should be saved
     :type path: str
     """
     for location in locations:
-        target = path / location.split('/')[-1]
+        parsed_url = urlparse(location)
+        target = path / parsed_url.path.split('/')[-1]
 
         logger.debug('location = %s, target = %s', location, target)
-
-        if urlparse(location).scheme:
-            response = requests.get(location)
+        if parsed_url.scheme:
+            response = requests.get(location, headers=headers)
             response.raise_for_status()
             with open(target, 'wb') as f:
                 f.write(response.content)

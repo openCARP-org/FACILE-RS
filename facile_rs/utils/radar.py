@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlparse
 
 import requests
 
@@ -120,7 +121,8 @@ def upload_radar_assets(radar_url, dataset_id, headers, assets, path):
     """
     url = radar_url + f'/radar-ingest/upload/{dataset_id}/file'
     for location in assets:
-        target = path / location.split('/')[-1]
+        parsed_url = urlparse(location)
+        target = path / parsed_url.path.split('/')[-1]
         files = {'upload_file': open(target, 'rb')}
 
         try:

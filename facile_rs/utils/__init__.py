@@ -12,6 +12,7 @@ class Settings:
     _shared_state = {}
 
     DEFAULTS = {
+        'ASSETS_TOKEN_NAME': 'PRIVATE-TOKEN',
         'LOG_LEVEL': 'WARN',
         'DRY': False
     }
