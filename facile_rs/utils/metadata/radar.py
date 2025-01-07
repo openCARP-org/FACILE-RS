@@ -152,7 +152,10 @@ class RadarMetadata:
                                 'nameIdentifierScheme': 'ORCID',
                             }]
 
-                    for affiliation in author.get('affiliation', []):
+                    author_affiliations = author.get('affiliation', [])
+                    if not isinstance(author_affiliations, list):
+                        author_affiliations = [author_affiliations]
+                    for affiliation in author_affiliations:
                         if 'name' in affiliation:
                             radar_creator['creatorAffiliation'] = {
                                 'value': affiliation['name']
@@ -190,7 +193,10 @@ class RadarMetadata:
                                     'nameIdentifierScheme': 'ORCID',
                                 }]
 
-                        for affiliation in contributor.get('affiliation', []):
+                        contributor_affiliations = contributor.get('affiliation', [])
+                        if not isinstance(contributor_affiliations, list):
+                            contributor_affiliations = [contributor_affiliations]
+                        for affiliation in contributor_affiliations:
                             if 'name' in affiliation:
                                 radar_creator['contributorAffiliation'] = {
                                     'value': affiliation['name']
