@@ -17,6 +17,7 @@ from facile_rs import (
     run_bibtex_pipeline,
     run_docstring_pipeline,
     run_markdown_pipeline,
+    run_notebook_pipeline,
 )
 
 
@@ -142,6 +143,13 @@ def create_parser():
                                                         parents=[run_markdown_pipeline.create_parser(add_help=False)],
                                                         add_help=True)
     parser_grav_markdown.set_defaults(func=run_markdown_pipeline.main)
+
+    parser_grav_notebook = grav_subparsers.add_parser('notebook',
+                                                        help='Run the notebook conversion pipeline',
+                                                        parents=[run_notebook_pipeline.create_parser(add_help=False)],
+                                                        add_help=True)
+    parser_grav_notebook.set_defaults(func=run_notebook_pipeline.main)
+
     return parser
 
 
