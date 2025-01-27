@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-"""Create dummy pages and links for a set of notebooks in a Grav CMS repository.
+"""Create dummy pages and links for a set of Jupyter notebooks in a Grav CMS repository.
 
 Description
 -----------
 
-This script parses a tree of notebooks and creates dummy pages and links in a Grav CMS repository.
+This script parses a tree of Jupyter notebooks and creates dummy pages and links in a Grav CMS repository.
 
 Contrary to the bibtex and markdown pipelines, this script does not copy one file to one page in Grav,
 but creates a tree of pages below one page (given by the pipeline header). it processes all ``.ipynb``files.
