@@ -33,7 +33,7 @@ from pathlib import Path
 
 import frontmatter
 
-from .utils import cli, settings
+from .utils import settings
 from .utils.grav import collect_pages
 
 logger = logging.getLogger(__file__)
@@ -111,11 +111,3 @@ def main():
                             # write the grav file
                             logger.info('writing to %s', md_path)
                             md_path.write_text(frontmatter.dumps(page))
-
-
-def main_deprecated():
-    cli.cli_call_deprecated(main)
-
-
-if __name__ == "__main__":
-    main_deprecated()
