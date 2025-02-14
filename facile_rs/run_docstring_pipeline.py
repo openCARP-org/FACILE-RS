@@ -206,7 +206,13 @@ def main():
                     # convert RST section headers to level 2 headings
                     body = body.replace('<h1 id=', '<h2 id=')
                     body = body.replace('</h1>', '</h2>')
-                    content = header + titleString + body + footer
+
+                    q2a_tags = metadata.get('q2a_tags', '')
+                    wrapped_q2a_tags = ''
+                    if q2a_tags:
+                        wrapped_q2a_tags += f'[q2a tags="{q2a_tags}"]\n'
+
+                    content = header + titleString + body + wrapped_q2a_tags + footer
 
                     # create directories in the grav tree
                     md_path.parent.mkdir(parents=True, exist_ok=True)
