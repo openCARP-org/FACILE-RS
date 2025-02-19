@@ -43,9 +43,9 @@ def create_parser(add_help=True):
 
     parser.add_argument('--codemeta-location', dest='codemeta_location',
                         help='Locations of the main codemeta.json JSON file')
-    parser.add_argument('--creators-location', dest='creators_locations', action='append', default=[],
+    parser.add_argument('--creators-locations', '--creators-location', dest='creators_locations', action='append', default=[],
                         help='Locations of codemeta JSON files for additional creators')
-    parser.add_argument('--contributors-location', dest='contributors_locations', action='append', default=[],
+    parser.add_argument('--contributors-locations', '--contributors-location', dest='contributors_locations', action='append', default=[],
                         help='Locations of codemeta JSON files for additional contributors')
     parser.add_argument('--cff-path', dest='cff_path',
                         help='Path to the cff output file')

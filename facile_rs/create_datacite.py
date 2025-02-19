@@ -30,9 +30,9 @@ def create_parser(add_help=True):
 
     parser.add_argument('--codemeta-location', dest='codemeta_location',
                         help='Location of the main codemeta.json JSON file')
-    parser.add_argument('--creators-location', dest='creators_locations', action='append', default=[],
+    parser.add_argument('--creators-locations', '--creators-location', dest='creators_locations', action='append', default=[],
                         help='Locations of codemeta JSON files for additional creators')
-    parser.add_argument('--contributors-location', dest='contributors_locations', action='append', default=[],
+    parser.add_argument('--contributors-locations', '--contributors-location', dest='contributors_locations', action='append', default=[],
                         help='Locations of codemeta JSON files for additional contributors')
     parser.add_argument('--datacite-path', dest='datacite_path',
                         help='Path to the DataCite XML output file')

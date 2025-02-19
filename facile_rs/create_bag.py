@@ -34,8 +34,12 @@ def create_parser(add_help=True):
                         help='Assets to be added to the bag.')
     parser.add_argument('--bag-path', dest='bag_path',
                         help='Path to the Bag directory')
-    parser.add_argument('--bag-info-location', dest='bag_info_locations', action='append', default=[],
+    parser.add_argument('--bag-info-locations', '--bag-info-location', dest='bag_info_locations', action='append', default=[],
                         help='Locations of the bag-info YAML/JSON files')
+    parser.add_argument('--assets-token', dest='assets_token',
+                        help='Private token, to be used when fetching assets')
+    parser.add_argument('--assets-token-name', dest='assets_token_name',
+                        help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
     parser.add_argument('--log-level', dest='log_level',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
     parser.add_argument('--log-file', dest='log_file',
@@ -58,7 +62,9 @@ def main():
     bag_path.mkdir()
 
     # collect assets
-    fetch_files(settings.ASSETS, bag_path)
+    fetch_files(settings.ASSETS, bag_path, headers={
+        settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
+    })
 
     # fetch bag-info
     bag_info = {}

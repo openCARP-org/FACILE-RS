@@ -58,7 +58,7 @@ variables:
   # Variables for releases
   RELEASE_TAG: ${CI_COMMIT_TAG}
   RELEASE_API_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases
-  RELEASE_ARCHIVE_URL: ${CI_PROJECT_URL}/-/archive/${CI_COMMIT_TAG}/${PROJECT_NAME}-${CI_COMMIT_TAG}.tar.gz
+  RELEASE_ARCHIVE_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/repository/archive.tar.gz?sha=${CI_COMMIT_TAG}
   RELEASE_DESCRIPTION: |
     Find the changelog [here](${CI_PROJECT_URL}/blob/master/CHANGELOG.md).
 

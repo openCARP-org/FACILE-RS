@@ -26,7 +26,7 @@ The release pipeline triggered by the creation of this tag will then:
 ### Optional workflows
 
 You can optionally trigger releases on RADAR or Zenodo by turning `ENABLE_ZENODO` or `ENABLE_RADAR` to "true" in `.gitlab/ci/facile-rs/.gitlab-ci.yml`.
-See the FACILE-RS documentation for more information about the configuration of these workflows.
+See the [dedicated section](#optional-release-workflows) for more information about the configuration of these workflows.
 
 ## Get started
 
@@ -95,3 +95,55 @@ default:
   tags:
     - docker
 ```
+
+### Optional release workflows
+
+You can optionally trigger releases on RADAR or Zenodo by turning `ENABLE_ZENODO` or `ENABLE_RADAR` to "true" in `.gitlab/ci/facile-rs/.gitlab-ci.yml`.
+
+#### Enable releases on Zenodo
+
+When the Zenodo workflow is enabled, the software releases created by the release workflows will also be uploaded to Zenodo.
+Once a release has been uploaded, you can log in to Zenodo and review it before it is published.
+
+In order to upload releases on Zenodo when triggering the release workflow, you have to enable the Zenodo workflow in the template and to register a Zenodo Personal access token in GitLab:
+- Set the variable `ENABLE_ZENODO` to "true" in `.gitlab/ci/facile-rs/.gitlab-ci.yml`.
+- Set the `ZENODO_URL` to https://sandbox.zenodo.org for uploading releases on the Zenodo test environment, or to https://zenodo.org to upload releases on Zenodo.
+- Create a Personal access token on Zenodo: open the `ZENODO_URL` in a web browser, log in, go to the Applications settings and create a new personal access token with scope "deposit:write". Copy the token and save it for the next step.
+- In your GitLab project, go to Settings -> CI/CD -> Variables, and add a new variable. Set the key as `ZENODO_TOKEN` and as a value paste the token created in the previous step. Make it "Masked" and check the box "Protect variable".
+
+You can now trigger a new release in your release branch by pushing a pre-release tag:
+```
+git tag pre-v0.0.2
+git push origin pre-v0.0.2
+```
+
+A GitLab release of your software will be created, and in addition, the release will be associated with a DOI and uploaded to Zenodo.
+Once the workflow has run, you can log in to Zenodo to review and publish your software release.
+
+#### Enable releases on RADAR
+
+In order to use the RADAR workflow, you have to possess publication credentials on a [RADAR](https://www.radar-service.eu/) instance.
+When the RADAR workflow is enabled, the software releases created by the release workflows will also be uploaded to RADAR.
+Once a release has been uploaded, you can log in to RADAR and review it before it is published.
+
+In order to use the RADAR release workflow, you have to enable the workflow and to register some RADAR secrets in GitLab:
+- Set the variable `ENABLE_RADAR` to "true" in `.gitlab/ci/facile-rs/.gitlab-ci.yml`.
+- In your GitLab project, go to Settings -> CI/CD -> Variables, and add the following variables (ensure to check the box "Protect variable" and to make them "Masked"):
+  * `RADAR_REDIRECT_URL` with the value being a link to a web page of your project or repository
+  * `RADAR_EMAIL` with the value being the email address of the data steward for this dataset
+  * `RADAR_WORKSPACE_ID` with the value being the ID of your RADAR workspace (see the URL to your workspace with the . followed by the name of your workspace)
+  * `RADAR_URL` with the value being the URL to your RADAR instance (talk to your RADAR admin)
+  * `RADAR_CLIENT_ID` with the value being your RADAR API client ID (talk to your RADAR admin)
+  * `RADAR_CLIENT_SECRET` with the value being your RADAR API secret (talk to your RADAR admin)
+  * `RADAR_USERNAME` with the value being your RADAR API user name (talk to your RADAR admin)
+  * `RADAR_PASSWORD` with the value being your RADAR API password (talk to your RADAR admin)
+
+You can now trigger a new release in your release branch by pushing a pre-release tag:
+```
+git tag pre-v0.0.2
+git push origin pre-v0.0.2
+```
+
+A GitLab release of your software will be created, and in addition, the release will be associated with a DOI and uploaded to RADAR.
+Once the workflow has run, you can log in to your RADAR instance to review and publish your software release.
+
