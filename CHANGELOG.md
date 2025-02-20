@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## Unreleased
 
+### Added
+- The "publisher" field in Zenodo metadata is now populated with the "publisher" name provided in the Codemeta file.
+
 ### Fixed
 - Fix remove-doubles when name is given as givenName and familyName.
 
