@@ -8,9 +8,22 @@ Description
 This script parses a tree of Jupyter notebooks and creates dummy pages and links in a Grav CMS repository.
 
 Contrary to the bibtex and markdown pipelines, this script does not copy one file to one page in Grav,
-but creates a tree of pages below one page (given by the pipeline header). it processes all ``.ipynb``files.
+but creates a tree of pages below one page (given by the pipeline header). It processes all ``.ipynb``files.
 
 The PIPELINE and PIPELINE_SOURCE options are used in the same way as in ``run_markdown_pipeline.py``.
+
+The script extracts some metadata from the first cell of each notebook it processes. For this to work the first cell
+should have the following layout.
+
+```json
+---
+title:
+subtitle:
+description:
+image:
+thumbnail:
+---
+```
 
 Please refer to https://git.opencarp.org/openCARP/onboarding for an example setup.
 
