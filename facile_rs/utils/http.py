@@ -69,7 +69,8 @@ def fetch_dict(location):
         response = requests.get(location)
         response.raise_for_status()
 
-        if parsed_url.path.endswith('.json'):
+        content_type = response.headers.get('content-type')
+        if content_type == 'application/json' or parsed_url.path.endswith('.json'):
             return json.loads(response.text)
         elif parsed_url.path.endswith('.yml') or parsed_url.path.endswith('.yaml'):
             return yaml.safe_load(response.text)

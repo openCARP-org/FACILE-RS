@@ -46,6 +46,7 @@ from facile_rs import (
     prepare_release,
     prepare_zenodo,
     run_bibtex_pipeline,
+    run_catalog_pipeline,
     run_docstring_pipeline,
     run_markdown_pipeline,
 )
@@ -204,6 +205,12 @@ def create_parser():
                                                     parents=[run_bibtex_pipeline.create_parser(add_help=False)],
                                                     add_help=True)
     parser_grav_bibtex.set_defaults(module=run_bibtex_pipeline)
+
+    parser_grav_catalog = grav_subparsers.add_parser('catalog',
+                                                     help='Run the catalog conversion pipeline',
+                                                     parents=[run_catalog_pipeline.create_parser(add_help=False)],
+                                                     add_help=True)
+    parser_grav_catalog.set_defaults(module=run_catalog_pipeline)
 
     parser_grav_docstring = grav_subparsers.add_parser('docstring',
                                                          help='Run the docstring conversion pipeline',
