@@ -24,7 +24,7 @@ import argparse
 import smtplib
 from pathlib import Path
 
-from .utils import cli, settings
+from .utils import cli, mkdir, settings
 from .utils.http import fetch_files
 from .utils.metadata import CodemetaMetadata, ZenodoMetadata
 from .utils.zenodo import create_zenodo_dataset, update_zenodo_dataset, upload_zenodo_assets
@@ -59,6 +59,8 @@ def create_parser(add_help=True):
                         help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
     parser.add_argument('--dry', action='store_true',
                         help='Perform a dry run, do not upload anything.')
+    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+                        help='Overwrite existing local directory')
     parser.add_argument('--log-level', dest='log_level',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
     parser.add_argument('--log-file', dest='log_file',
@@ -78,9 +80,10 @@ def main():
 
     # setup the bag directory
     zenodo_path = Path(settings.ZENODO_PATH).expanduser()
-    if zenodo_path.exists():
+    try:
+        mkdir(zenodo_path, settings.OVERWRITE)
+    except FileExistsError:
         parser.error(f'{zenodo_path} already exists.')
-    zenodo_path.mkdir()
 
     # prepare Zenodo payload
     codemeta = CodemetaMetadata()

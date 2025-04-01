@@ -24,7 +24,7 @@ import argparse
 import smtplib
 from pathlib import Path
 
-from .utils import cli, settings
+from .utils import cli, mkdir, settings
 from .utils.http import fetch_files
 from .utils.metadata import CodemetaMetadata, RadarMetadata
 from .utils.radar import create_radar_dataset, fetch_radar_token, update_radar_dataset, upload_radar_assets
@@ -73,6 +73,8 @@ def create_parser(add_help=True):
                         help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
     parser.add_argument('--dry', action='store_true',
                         help='Perform a dry run, do not upload anything.')
+    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+                        help='Overwrite existing local directory')
     parser.add_argument('--log-level', dest='log_level',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
     parser.add_argument('--log-file', dest='log_file',
@@ -97,11 +99,12 @@ def main():
         'RADAR_BACKLINK'
     ])
 
-    # setup the bag directory
+    # setup the radar directory
     radar_path = Path(settings.RADAR_PATH).expanduser()
-    if radar_path.exists():
+    try:
+        mkdir(radar_path, settings.OVERWRITE)
+    except FileExistsError:
         parser.error(f'{radar_path} already exists.')
-    radar_path.mkdir()
 
     # prepare radar payload
     codemeta = CodemetaMetadata()

@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -71,3 +72,9 @@ class Settings:
 
 
 settings = Settings()
+
+
+def mkdir(path, overwrite=False):
+    if overwrite:
+        shutil.rmtree(path)
+    path.mkdir(parents=True)

@@ -24,7 +24,7 @@ from pathlib import Path
 
 import bagit
 
-from .utils import cli, settings
+from .utils import cli, mkdir, settings
 from .utils.checksum import get_sha256, get_sha512
 from .utils.http import fetch_dict, fetch_files
 
@@ -44,6 +44,8 @@ def create_parser(add_help=True):
                         help='Private token, to be used when fetching assets')
     parser.add_argument('--assets-token-name', dest='assets_token_name',
                         help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
+    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+                        help='Overwrite existing Bag directory')
     parser.add_argument('--log-level', dest='log_level',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
     parser.add_argument('--log-file', dest='log_file',
@@ -62,9 +64,10 @@ def main():
 
     # setup the bag
     bag_path = Path(settings.BAG_PATH).expanduser()
-    if bag_path.exists():
+    try:
+        mkdir(bag_path, settings.OVERWRITE)
+    except FileExistsError:
         parser.error(f'{bag_path} already exists.')
-    bag_path.mkdir()
 
     # collect assets
     fetch_files(settings.ASSETS, bag_path, headers={
