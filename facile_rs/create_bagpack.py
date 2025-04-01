@@ -38,7 +38,7 @@ def create_parser(add_help=True):
                         help='Path to the Bag directory')
     parser.add_argument('--bag-info-locations', '--bag-info-location', dest='bag_info_locations', action='append', default=[],
                         help='Locations of the bag-info YAML/JSON files')
-    parser.add_argument('--datacite-path', dest='datacite_path',
+    parser.add_argument('--datacite-locations', '--datacite-location', dest='datacite_locations', action='append', default=[],
                         help='Path to the DataCite XML file')
     parser.add_argument('--assets-token', dest='assets_token',
                         help='Private token, to be used when fetching assets')
@@ -59,7 +59,7 @@ def main():
 
     settings.setup(parser, validate=[
         'BAG_PATH',
-        'DATACITE_PATH'
+        'DATACITE_LOCATIONS'
     ])
 
     # setup the bag
@@ -83,18 +83,18 @@ def main():
     bag = bagit.make_bag(bag_path, bag_info)
     bag.save()
 
-    # get datacite.xml and put it in the bag
-    datacite_path = Path(settings.DATACITE_PATH).expanduser()
-    datacite_xml = datacite_path.read_text()
+    # fetch datacite.xml and put it in the bag
     datacite_bag_path = bag_path / 'metadata' / 'datacite.xml'
     datacite_bag_path.parent.mkdir()
-    datacite_bag_path.write_text(datacite_xml)
+    fetch_files(settings.DATACITE_LOCATIONS, datacite_bag_path.parent, file_name=datacite_bag_path.name, headers={
+        settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
+    })
 
     with open(bag_path / 'tagmanifest-sha256.txt', 'a') as f:
-        f.write(f'{get_sha256(datacite_path)} metadata/datacite.xml\n')
+        f.write(f'{get_sha256(datacite_bag_path)} metadata/datacite.xml\n')
 
     with open(bag_path / 'tagmanifest-sha512.txt', 'a') as f:
-        f.write(f'{get_sha512(datacite_path)} metadata/datacite.xml\n')
+        f.write(f'{get_sha512(datacite_bag_path)} metadata/datacite.xml\n')
 
 
 def main_deprecated():
