@@ -21,11 +21,11 @@ Usage
 """
 
 import argparse
-import smtplib
 from pathlib import Path
 
 from .utils import cli, mkdir, settings
 from .utils.http import fetch_files
+from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, ZenodoMetadata
 from .utils.zenodo import create_zenodo_dataset, update_zenodo_dataset, upload_zenodo_assets
 
@@ -44,7 +44,7 @@ def create_parser(add_help=True):
                         help='Do not sort authors alphabetically, keep order in codemeta.json file')
     parser.set_defaults(sort_authors=True)
     parser.add_argument('--zenodo-path', dest='zenodo_path',
-                        help='Path to the directory where the assets are collected before upload to Zenodo.')
+                        help='Path to the local directory, where the assets are collected before upload.')
     parser.add_argument('--zenodo-url', dest='zenodo_url',
                         help='URL of the Zenodo service. Test environment available at https://sandbox.zenodo.org')
     parser.add_argument('--zenodo-token', dest='zenodo_token',
@@ -115,31 +115,22 @@ def main():
                     zenodo_id = identifier['value']
 
         if zenodo_id:
-            print('zenodo_id:', zenodo_id)
             dataset_id = update_zenodo_dataset(settings.ZENODO_URL, zenodo_id, settings.ZENODO_TOKEN, zenodo_dict)
         else:
-            print(zenodo_id, 'not found')
             dataset_id = create_zenodo_dataset(settings.ZENODO_URL, settings.ZENODO_TOKEN, zenodo_dict)
 
         # upload assets
         upload_zenodo_assets(settings.ZENODO_URL, dataset_id, settings.ZENODO_TOKEN, settings.ASSETS, zenodo_path)
 
         if settings.SMTP_SERVER and settings.NOTIFICATION_EMAIL:
-            message = """\
-    From: {}
-    To: {}
-    Subject: {}
+            zenodo_url = f'{settings.ZENODO_URL}/uploads/{dataset_id}'
 
-    {}
-    """.format(
-        settings.NOTIFICATION_EMAIL,
-        settings.NOTIFICATION_EMAIL,
-        "New Zenodo release ready to publish",
-        "A new Zenodo release has been uploaded by a CI pipeline.\n\n Please visit"
-        f" {settings.ZENODO_URL}/uploads/{dataset_id} to publish this release.")
-            server = smtplib.SMTP(settings.SMTP_SERVER)
-            server.sendmail(settings.NOTIFICATION_EMAIL, settings.NOTIFICATION_EMAIL, message)
-            server.quit()
+            send_mail(
+                settings.SMTP_SERVER, settings.NOTIFICATION_EMAIL, settings.NOTIFICATION_EMAIL,
+                'New Zenodo release ready to publish',
+                'A new Zenodo release has been uploaded by a CI pipeline.\n\n'
+                f'Please visit {zenodo_url} to publish this release.'
+            )
 
 
 def main_deprecated():

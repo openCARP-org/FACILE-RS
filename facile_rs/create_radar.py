@@ -26,6 +26,7 @@ from pathlib import Path
 
 from .utils import cli, mkdir, settings
 from .utils.http import fetch_files
+from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, RadarMetadata
 from .utils.radar import create_radar_dataset, fetch_radar_token, update_radar_dataset, upload_radar_assets
 
@@ -44,7 +45,7 @@ def create_parser(add_help=True):
                         help='Do not sort authors alphabetically, keep order in codemeta.json file')
     parser.set_defaults(sort_authors=True)
     parser.add_argument('--radar-path', dest='radar_path',
-                        help='Path to the Radar directory, where the assets are collected before upload.')
+                        help='Path to the local directory, where the assets are collected before upload.')
     parser.add_argument('--radar-url', dest='radar_url',
                         help='URL of the RADAR service.')
     parser.add_argument('--radar-username', dest='radar_username',
@@ -146,24 +147,14 @@ def main():
         upload_radar_assets(settings.RADAR_URL, dataset_id, headers, settings.ASSETS, radar_path)
 
     if settings.SMTP_SERVER and settings.NOTIFICATION_EMAIL:
-        message = """\
-From: {}
-To: {}
-Subject: {}
+        radar_url = f'{settings.RADAR_URL}/radar/de/workspace/{settings.RADAR_WORKSPACE_ID}.{settings.RADAR_CLIENT_ID}'
 
-{}
-""".format(
-    settings.RADAR_EMAIL,
-    settings.NOTIFICATION_EMAIL,
-    "New RADAR release ready to publish",
-    "A new RADAR release has been uploaded by a CI pipeline.\n\n Please visit"
-    " https://radar.kit.edu/radar/de/workspace/{}.{} to publish this release.".format(
-        settings.RADAR_WORKSPACE_ID,settings.RADAR_CLIENT_ID
-))
-        server = smtplib.SMTP(settings.SMTP_SERVER)
-        server.sendmail(settings.RADAR_EMAIL, settings.NOTIFICATION_EMAIL, message)
-        server.quit()
-
+        send_mail(
+            settings.SMTP_SERVER, settings.RADAR_EMAIL, settings.NOTIFICATION_EMAIL,
+            'New RADAR release ready to publish',
+            'A new RADAR release has been uploaded by a CI pipeline.\n\n'
+            f'Please visit {radar_url} to publish this release.'
+        )
 
 def main_deprecated():
     cli.cli_call_deprecated(main)
