@@ -1,7 +1,11 @@
 import argparse
-import inspect
-import os.path
+import logging
+import os
+import sys
+from pathlib import Path
 from warnings import warn
+
+from dotenv import load_dotenv
 
 from facile_rs import (
     create_bag,
@@ -20,6 +24,39 @@ from facile_rs import (
 )
 
 
+class Parser(argparse.ArgumentParser):
+    """
+    Custom ArgumentParser class, which adds the functionality to add default values from the environment.
+    """
+
+    def add_argument(self, *args, **kwargs):
+        argument = super().add_argument(*args, **kwargs)
+
+        if not isinstance(argument, argparse._HelpAction):
+            # update the default value for the argument with a possible environment variable
+            default = os.getenv(argument.dest)
+            if default is not None:
+                # if the argument is a list, split the default from the environment
+                if kwargs.get('nargs') == '*' or kwargs.get('action') == 'append':
+                    default = default.split()
+
+                argument.default = default
+
+            # remove the required argument if a default is set
+            if argument.required and argument.default:
+                argument.required = False
+
+        return argument
+
+    def get_subparser(self, subcommand):
+        # returns the subparser for a given subcommand
+        for action in self._actions:
+            if isinstance(action, argparse._SubParsersAction):
+                subparser = action.choices[subcommand]
+                return subparser
+
+
+
 # create the top-level parser
 def create_parser():
     """
@@ -29,8 +66,9 @@ def create_parser():
 
     :return: The parser object.
     """
+
     # Main parser
-    parser = argparse.ArgumentParser(prog='facile-rs',
+    parser = Parser(prog='facile-rs',
         description="FACILE-RS command-line tool, to perform metadata conversion and software publication" \
             "based on CodeMeta metadata.",
         epilog="Get help on a subcommand by running 'facile-rs <subcommand> -h'.")
@@ -46,7 +84,7 @@ def create_parser():
                                                            help='Update CodeMeta file with the given version and date',
                                                            parents=[prepare_release.create_parser(add_help=False)],
                                                            add_help=True)
-    parser_release_prepare.set_defaults(func=prepare_release.main)
+    parser_release_prepare.set_defaults(module=prepare_release)
 
     # Parser for the 'gitlab' subcommand
     parser_gitlab = subparsers.add_parser('gitlab', help='Perform operations for GitLab releases')
@@ -55,7 +93,7 @@ def create_parser():
                                                         parents=[create_release.create_parser(add_help=False)],
                                                         help="Create a release on GitLab",
                                                         add_help=True)
-    parser_gitlab_publish.set_defaults(func=create_release.main)
+    parser_gitlab_publish.set_defaults(module=create_release)
 
     # Parser for the 'radar' subcommand
     parser_radar = subparsers.add_parser('radar', help='Perform operations for RADAR releases')
@@ -64,12 +102,12 @@ def create_parser():
                                                        help='Prepare a release on RADAR',
                                                        parents=[prepare_radar.create_parser(add_help=False)],
                                                        add_help=True)
-    parser_radar_prepare.set_defaults(func=prepare_radar.main)
+    parser_radar_prepare.set_defaults(module=prepare_radar)
     parser_radar_upload = radar_subparsers.add_parser('upload',
                                                       help='Create a release on RADAR',
                                                       parents=[create_radar.create_parser(add_help=False)],
                                                       add_help=True)
-    parser_radar_upload.set_defaults(func=create_radar.main)
+    parser_radar_upload.set_defaults(module=create_radar)
 
     # Parser for the 'zenodo' subcommand
     parser_zenodo = subparsers.add_parser('zenodo', help='Perform operations for Zenodo releases')
@@ -78,12 +116,12 @@ def create_parser():
                                                         help='Prepare a release on Zenodo',
                                                         parents=[prepare_zenodo.create_parser(add_help=False)],
                                                         add_help=True)
-    parser_zenodo_prepare.set_defaults(func=prepare_zenodo.main)
+    parser_zenodo_prepare.set_defaults(module=prepare_zenodo)
     parser_zenodo_upload = zenodo_subparsers.add_parser('upload',
                                                         help='Create a release on Zenodo',
                                                         parents=[create_zenodo.create_parser(add_help=False)],
                                                         add_help=True)
-    parser_zenodo_upload.set_defaults(func=create_zenodo.main)
+    parser_zenodo_upload.set_defaults(module=create_zenodo)
 
     # Parser for the 'cff' subcommand
     parser_cff = subparsers.add_parser('cff', help='Generate and manage CFF metadata')
@@ -92,7 +130,7 @@ def create_parser():
                                                   help='Create a CFF metadata file',
                                                   parents=[create_cff.create_parser(add_help=False)],
                                                   add_help=True)
-    parser_cff_create.set_defaults(func=create_cff.main)
+    parser_cff_create.set_defaults(module=create_cff)
 
     # Parser for the 'datacite' subcommand
     parser_datacite = subparsers.add_parser('datacite', help='Generate and manage DataCite metadata')
@@ -101,7 +139,7 @@ def create_parser():
                                                             help='Create a DataCite metadata file',
                                                             parents=[create_datacite.create_parser(add_help=False)],
                                                             add_help=True)
-    parser_datacite_create.set_defaults(func=create_datacite.main)
+    parser_datacite_create.set_defaults(module=create_datacite)
 
     # Parser for the 'bag' subcommand
     parser_bag = subparsers.add_parser('bag', help='Generate and manage BagIt bags')
@@ -110,7 +148,7 @@ def create_parser():
                                                   help='Create a BagIt bag',
                                                   parents=[create_bag.create_parser(add_help=False)],
                                                   add_help=True)
-    parser_bag_create.set_defaults(func=create_bag.main)
+    parser_bag_create.set_defaults(module=create_bag)
 
     # Parser for the 'bagpack' subcommand
     parser_bagpack = subparsers.add_parser('bagpack',
@@ -120,7 +158,7 @@ def create_parser():
                                                           help='Create a BagIt bag with DataCite metadata',
                                                           parents=[create_bagpack.create_parser(add_help=False)],
                                                           add_help=True)
-    parser_bagpack_create.set_defaults(func=create_bagpack.main)
+    parser_bagpack_create.set_defaults(module=create_bagpack)
 
     # Parser for the 'grav' subcommand
     parser_grav = subparsers.add_parser('grav', help='Perform operations for Grav CMS')
@@ -129,30 +167,54 @@ def create_parser():
                                                     help='Run the BibTex conversion pipeline',
                                                     parents=[run_bibtex_pipeline.create_parser(add_help=False)],
                                                     add_help=True)
-    parser_grav_bibtex.set_defaults(func=run_bibtex_pipeline.main)
+    parser_grav_bibtex.set_defaults(module=run_bibtex_pipeline)
 
     parser_grav_docstring = grav_subparsers.add_parser('docstring',
                                                          help='Run the docstring conversion pipeline',
                                                          parents=[run_docstring_pipeline.create_parser(add_help=False)],
                                                          add_help=True)
-    parser_grav_docstring.set_defaults(func=run_docstring_pipeline.main)
+    parser_grav_docstring.set_defaults(module=run_docstring_pipeline)
 
     parser_grav_markdown = grav_subparsers.add_parser('markdown',
                                                         help='Run the Markdown conversion pipeline',
                                                         parents=[run_markdown_pipeline.create_parser(add_help=False)],
                                                         add_help=True)
-    parser_grav_markdown.set_defaults(func=run_markdown_pipeline.main)
+    parser_grav_markdown.set_defaults(module=run_markdown_pipeline)
     return parser
 
 
-def cli_call_deprecated(func):
+def cli_call_deprecated(module_name):
     """
     Display a deprecation warning when a script is called from the command line directly,
     without using the 'facile-rs' entry point.
 
     :param func: The main function to call in the script.
     """
-    script_name = os.path.basename(inspect.getfile(func)).removesuffix('.py')
-    warn(f"Calling {script_name} directly is deprecated. Use the entry point 'facile-rs' instead.",
-         stacklevel=2)
-    func()
+
+    # create the deprecication warning
+    module = sys.modules[module_name]
+    script_name = module.__name__.split('.')[-1]
+    warn(f"Calling {script_name} directly is deprecated. Use the entry point 'facile-rs' instead.", stacklevel=2)
+
+    # load the environment
+    setup_env()
+
+    # parse the arguments
+    parser = module.create_parser()
+    args = parser.parse_args()
+
+    # setup logs
+    setup_logs(args.LOG_LEVEL, args.LOG_FILE)
+
+    # call the main function
+    module.main(args)
+
+
+def setup_env():
+    load_dotenv(Path().cwd() / '.env')
+
+
+def setup_logs(log_level, log_file):
+    log_level = log_level.upper()
+    log_file = Path(log_file).expanduser().as_posix() if log_file is not None else None
+    logging.basicConfig(level=log_level, filename=log_file, format='[%(asctime)s] %(levelname)s %(name)s: %(message)s')
