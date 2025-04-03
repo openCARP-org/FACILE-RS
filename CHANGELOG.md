@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 - Fix remove-doubles when name is given as givenName and familyName.
 
+### Removed
+- Drop support for Python 3.8
+
 ## v3.2.1
 
 ### Changed
