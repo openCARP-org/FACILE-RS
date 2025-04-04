@@ -21,9 +21,8 @@ Usage
 """
 
 import argparse
-from pathlib import Path
 
-from .utils import cli, mk_empty_dir, settings
+from .utils import cli, settings, setup_assets_path, setup_tmp_assets_path
 from .utils.http import fetch_files
 from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, ZenodoMetadata
@@ -73,17 +72,18 @@ def main():
 
     settings.setup(parser, validate=[
         'CODEMETA_LOCATION',
-        'ZENODO_PATH',
         'ZENODO_URL',
         'ZENODO_TOKEN'
     ])
 
     # setup the bag directory
-    zenodo_path = Path(settings.ZENODO_PATH).expanduser()
-    try:
-        mk_empty_dir(zenodo_path, settings.OVERWRITE)
-    except FileExistsError:
-        parser.error(f'{zenodo_path} already exists.')
+    if settings.ZENODO_PATH is None:
+        zenodo_path, tmp_dir = setup_tmp_assets_path()
+    else:
+        try:
+            zenodo_path = setup_assets_path(settings.ZENODO_PATH, settings.OVERWRITE)
+        except FileExistsError:
+            parser.error(f'{settings.ZENODO_PATH} already exists.')
 
     # prepare Zenodo payload
     codemeta = CodemetaMetadata()
@@ -131,6 +131,11 @@ def main():
                 'A new Zenodo release has been uploaded by a CI pipeline.\n\n'
                 f'Please visit {zenodo_url} to publish this release.'
             )
+
+    try:
+        tmp_dir.cleanup()
+    except UnboundLocalError:
+        pass
 
 
 def main_deprecated():

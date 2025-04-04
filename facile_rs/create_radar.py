@@ -21,10 +21,8 @@ Usage
 """
 
 import argparse
-import smtplib
-from pathlib import Path
 
-from .utils import cli, mk_empty_dir, settings
+from .utils import cli, settings, setup_assets_path, setup_tmp_assets_path
 from .utils.http import fetch_files
 from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, RadarMetadata
@@ -88,7 +86,6 @@ def main():
 
     settings.setup(parser, validate=[
         'CODEMETA_LOCATION',
-        'RADAR_PATH',
         'RADAR_URL',
         'RADAR_CLIENT_ID',
         'RADAR_CLIENT_SECRET',
@@ -101,11 +98,13 @@ def main():
     ])
 
     # setup the radar directory
-    radar_path = Path(settings.RADAR_PATH).expanduser()
-    try:
-        mk_empty_dir(radar_path, settings.OVERWRITE)
-    except FileExistsError:
-        parser.error(f'{radar_path} already exists.')
+    if settings.RADAR_PATH is None:
+        radar_path, tmp_dir = setup_tmp_assets_path()
+    else:
+        try:
+            radar_path = setup_assets_path(settings.RADAR_PATH, settings.OVERWRITE)
+        except FileExistsError:
+            parser.error(f'{settings.RADAR_PATH} already exists.')
 
     # prepare radar payload
     codemeta = CodemetaMetadata()
@@ -155,6 +154,12 @@ def main():
             'A new RADAR release has been uploaded by a CI pipeline.\n\n'
             f'Please visit {radar_url} to publish this release.'
         )
+
+    try:
+        tmp_dir.cleanup()
+    except UnboundLocalError:
+        pass
+
 
 def main_deprecated():
     cli.cli_call_deprecated(main)

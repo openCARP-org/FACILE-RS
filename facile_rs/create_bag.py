@@ -19,11 +19,10 @@ Usage
 """
 
 import argparse
-from pathlib import Path
 
 import bagit
 
-from .utils import cli, mk_empty_dir, settings
+from .utils import cli, settings, setup_assets_path
 from .utils.http import fetch_dict, fetch_files
 
 
@@ -58,11 +57,10 @@ def main():
     ])
 
     # setup the bag
-    bag_path = Path(settings.BAG_PATH).expanduser()
     try:
-        mk_empty_dir(bag_path, settings.OVERWRITE)
+        bag_path = setup_assets_path(settings.BAG_PATH, settings.OVERWRITE)
     except FileExistsError:
-        parser.error(f'{bag_path} already exists.')
+        parser.error(f'{settings.BAG_PATH} already exists.')
 
     # collect assets
     fetch_files(settings.ASSETS, bag_path, headers={

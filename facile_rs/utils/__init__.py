@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+import tempfile
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -74,7 +75,14 @@ class Settings:
 settings = Settings()
 
 
-def mk_empty_dir(path, overwrite=False):
+def setup_assets_path(assets_path, overwrite=False):
+    path = Path(assets_path).expanduser()
     if overwrite:
         shutil.rmtree(path)
     path.mkdir(parents=True)
+    return path
+
+
+def setup_tmp_assets_path():
+    tmp_dir = tempfile.TemporaryDirectory(prefix='facile-rs', delete=False)
+    return Path(tmp_dir.name), tmp_dir
