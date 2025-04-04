@@ -23,7 +23,7 @@ from pathlib import Path
 
 import bagit
 
-from .utils import cli, mkdir, settings
+from .utils import cli, mk_empty_dir, settings
 from .utils.http import fetch_dict, fetch_files
 
 
@@ -60,7 +60,7 @@ def main():
     # setup the bag
     bag_path = Path(settings.BAG_PATH).expanduser()
     try:
-        mkdir(bag_path, settings.OVERWRITE)
+        mk_empty_dir(bag_path, settings.OVERWRITE)
     except FileExistsError:
         parser.error(f'{bag_path} already exists.')
 

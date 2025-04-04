@@ -74,7 +74,7 @@ class Settings:
 settings = Settings()
 
 
-def mkdir(path, overwrite=False):
+def mk_empty_dir(path, overwrite=False):
     if overwrite:
         shutil.rmtree(path)
     path.mkdir(parents=True)

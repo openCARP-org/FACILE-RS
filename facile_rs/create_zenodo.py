@@ -23,7 +23,7 @@ Usage
 import argparse
 from pathlib import Path
 
-from .utils import cli, mkdir, settings
+from .utils import cli, mk_empty_dir, settings
 from .utils.http import fetch_files
 from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, ZenodoMetadata
@@ -81,7 +81,7 @@ def main():
     # setup the bag directory
     zenodo_path = Path(settings.ZENODO_PATH).expanduser()
     try:
-        mkdir(zenodo_path, settings.OVERWRITE)
+        mk_empty_dir(zenodo_path, settings.OVERWRITE)
     except FileExistsError:
         parser.error(f'{zenodo_path} already exists.')
 

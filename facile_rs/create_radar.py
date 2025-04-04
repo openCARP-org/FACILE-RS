@@ -24,7 +24,7 @@ import argparse
 import smtplib
 from pathlib import Path
 
-from .utils import cli, mkdir, settings
+from .utils import cli, mk_empty_dir, settings
 from .utils.http import fetch_files
 from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, RadarMetadata
@@ -103,7 +103,7 @@ def main():
     # setup the radar directory
     radar_path = Path(settings.RADAR_PATH).expanduser()
     try:
-        mkdir(radar_path, settings.OVERWRITE)
+        mk_empty_dir(radar_path, settings.OVERWRITE)
     except FileExistsError:
         parser.error(f'{radar_path} already exists.')
 
