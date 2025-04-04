@@ -26,7 +26,7 @@ import bagit
 
 from .utils import cli, mk_empty_dir, settings
 from .utils.checksum import get_sha256, get_sha512
-from .utils.http import fetch_dict, fetch_files
+from .utils.http import fetch_dict, fetch_file, fetch_files
 
 
 def create_parser(add_help=True):
@@ -38,7 +38,7 @@ def create_parser(add_help=True):
                         help='Path to the Bag directory')
     parser.add_argument('--bag-info-locations', '--bag-info-location', dest='bag_info_locations', action='append', default=[],
                         help='Locations of the bag-info YAML/JSON files')
-    parser.add_argument('--datacite-locations', '--datacite-location', dest='datacite_locations', action='append', default=[],
+    parser.add_argument('--datacite-location', dest='datacite_location',
                         help='Path to the DataCite XML file')
     parser.add_argument('--assets-token', dest='assets_token',
                         help='Private token, to be used when fetching assets')
@@ -59,7 +59,7 @@ def main():
 
     settings.setup(parser, validate=[
         'BAG_PATH',
-        'DATACITE_LOCATIONS'
+        'DATACITE_LOCATION'
     ])
 
     # setup the bag
@@ -86,7 +86,7 @@ def main():
     # fetch datacite.xml and put it in the bag
     datacite_bag_path = bag_path / 'metadata' / 'datacite.xml'
     datacite_bag_path.parent.mkdir()
-    fetch_files(settings.DATACITE_LOCATIONS, datacite_bag_path.parent, file_name=datacite_bag_path.name, headers={
+    fetch_file(settings.DATACITE_LOCATION, datacite_bag_path.parent, datacite_bag_path.name, headers={
         settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
     })
 

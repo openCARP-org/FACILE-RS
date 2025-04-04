@@ -10,27 +10,43 @@ import yaml
 logger = logging.getLogger(__file__)
 
 
-def fetch_files(locations, path, file_name=None, headers={}):
-    """Fetch files from local locations or a URLs and save them at the given path.
+def fetch_files(locations, path, headers={}):
+    """
+    Fetch files from local locations or from URLs and save them at the given path.
 
     :param locations: list of URL or paths to the files
     :type locations: list of str
-    :param path: location where the files should be saved
+    :param path: path where the files should be saved
     :type path: str
     """
     for location in locations:
-        parsed_url = urlparse(location)
-        target = path / (file_name or parsed_url.path.split('/')[-1])
+        fetch_file(location, path, headers=headers)
 
-        logger.debug('location = %s, target = %s', location, target)
-        if parsed_url.scheme:
-            response = requests.get(location, headers=headers)
-            response.raise_for_status()
-            with open(target, 'wb') as f:
-                f.write(response.content)
 
-        else:
-            shutil.copyfile(location, target)
+def fetch_file(location, path, file_name=None, headers={}):
+    """
+    Fetch one file from a local location or an URL and save them at the given path.
+    If no file_name is provided it will be created from the location
+
+    :param location: URL or path to the file
+    :type locations: str or Path
+    :param path: path where the file should be saved
+    :type path: str or Path
+    :param file_name: name of the file
+    :type path: str
+    """
+    parsed_url = urlparse(location)
+    target = path / (file_name or parsed_url.path.split('/')[-1])
+
+    logger.debug('location = %s, target = %s', location, target)
+    if parsed_url.scheme:
+        response = requests.get(location, headers=headers)
+        response.raise_for_status()
+        with open(target, 'wb') as f:
+            f.write(response.content)
+
+    else:
+        shutil.copyfile(location, target)
 
 
 def fetch_dict(location):
