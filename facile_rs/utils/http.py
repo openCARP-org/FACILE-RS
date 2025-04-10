@@ -7,10 +7,12 @@ from urllib.parse import urlparse
 import requests
 import yaml
 
+from .exceptions import AssetExistsError
+
 logger = logging.getLogger(__file__)
 
 
-def fetch_files(locations, path, headers={}):
+def fetch_files(locations, path, headers={}, overwrite=False):
     """
     Fetch files from local locations or from URLs and save them at the given path.
 
@@ -20,10 +22,10 @@ def fetch_files(locations, path, headers={}):
     :type path: str
     """
     for location in locations:
-        fetch_file(location, path, headers=headers)
+        fetch_file(location, path, headers=headers, overwrite=overwrite)
 
 
-def fetch_file(location, path, file_name=None, headers={}):
+def fetch_file(location, path, file_name=None, headers={}, overwrite=False):
     """
     Fetch one file from a local location or an URL and save them at the given path.
     If no file_name is provided it will be created from the location
@@ -37,6 +39,9 @@ def fetch_file(location, path, file_name=None, headers={}):
     """
     parsed_url = urlparse(location)
     target = path / (file_name or parsed_url.path.split('/')[-1])
+
+    if target.exists() and not overwrite:
+        raise AssetExistsError(location, target)
 
     logger.debug('location = %s, target = %s', location, target)
     if parsed_url.scheme:

@@ -58,7 +58,7 @@ def main():
 
     # setup the bag
     try:
-        bag_path = setup_assets_path(settings.BAG_PATH, settings.OVERWRITE)
+        bag_path = setup_assets_path(settings.BAG_PATH, remove_existing=settings.OVERWRITE)
     except FileExistsError:
         parser.error(f'{settings.BAG_PATH} already exists.')
 
