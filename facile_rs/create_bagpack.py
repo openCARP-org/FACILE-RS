@@ -20,13 +20,12 @@ Usage
 """
 
 import argparse
-from pathlib import Path
 
 import bagit
 
-from .utils import cli, settings
+from .utils import cli, settings, setup_assets_path
 from .utils.checksum import get_sha256, get_sha512
-from .utils.http import fetch_dict, fetch_files
+from .utils.http import fetch_dict, fetch_file, fetch_files
 
 
 def create_parser(add_help=True):
@@ -38,12 +37,14 @@ def create_parser(add_help=True):
                         help='Path to the Bag directory')
     parser.add_argument('--bag-info-locations', '--bag-info-location', dest='bag_info_locations', action='append', default=[],
                         help='Locations of the bag-info YAML/JSON files')
-    parser.add_argument('--datacite-path', dest='datacite_path',
+    parser.add_argument('--datacite-location', dest='datacite_location',
                         help='Path to the DataCite XML file')
     parser.add_argument('--assets-token', dest='assets_token',
                         help='Private token, to be used when fetching assets')
     parser.add_argument('--assets-token-name', dest='assets_token_name',
                         help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
+    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+                        help='Overwrite existing Bag directory')
     parser.add_argument('--log-level', dest='log_level',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
     parser.add_argument('--log-file', dest='log_file',
@@ -57,14 +58,14 @@ def main():
 
     settings.setup(parser, validate=[
         'BAG_PATH',
-        'DATACITE_PATH'
+        'DATACITE_LOCATION'
     ])
 
     # setup the bag
-    bag_path = Path(settings.BAG_PATH).expanduser()
-    if bag_path.exists():
-        parser.error(f'{bag_path} already exists.')
-    bag_path.mkdir()
+    try:
+        bag_path = setup_assets_path(settings.BAG_PATH, remove_existing=settings.OVERWRITE)
+    except FileExistsError:
+        parser.error(f'{settings.BAG_PATH} already exists.')
 
     # collect assets
     fetch_files(settings.ASSETS, bag_path, headers={
@@ -80,18 +81,18 @@ def main():
     bag = bagit.make_bag(bag_path, bag_info)
     bag.save()
 
-    # get datacite.xml and put it in the bag
-    datacite_path = Path(settings.DATACITE_PATH).expanduser()
-    datacite_xml = datacite_path.read_text()
+    # fetch datacite.xml and put it in the bag
     datacite_bag_path = bag_path / 'metadata' / 'datacite.xml'
     datacite_bag_path.parent.mkdir()
-    datacite_bag_path.write_text(datacite_xml)
+    fetch_file(settings.DATACITE_LOCATION, datacite_bag_path.parent, datacite_bag_path.name, headers={
+        settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
+    })
 
     with open(bag_path / 'tagmanifest-sha256.txt', 'a') as f:
-        f.write(f'{get_sha256(datacite_path)} metadata/datacite.xml\n')
+        f.write(f'{get_sha256(datacite_bag_path)} metadata/datacite.xml\n')
 
     with open(bag_path / 'tagmanifest-sha512.txt', 'a') as f:
-        f.write(f'{get_sha512(datacite_path)} metadata/datacite.xml\n')
+        f.write(f'{get_sha512(datacite_bag_path)} metadata/datacite.xml\n')
 
 
 def main_deprecated():
