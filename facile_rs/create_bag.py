@@ -27,49 +27,44 @@ from .utils.http import fetch_dict, fetch_files
 
 
 def create_parser(add_help=True):
-    parser = argparse.ArgumentParser(add_help=add_help)
+    parser = cli.Parser(add_help=add_help)
 
-    parser.add_argument('assets', nargs='*', default=[],
+    parser.add_argument('ASSETS', nargs='*', default=[],
                         help='Assets to be added to the bag.')
-    parser.add_argument('--bag-path', dest='bag_path',
+    parser.add_argument('--bag-path', dest='BAG_PATH', required=True,
                         help='Path to the Bag directory')
-    parser.add_argument('--bag-info-locations', '--bag-info-location', dest='bag_info_locations', action='append', default=[],
+    parser.add_argument('--bag-info-locations', '--bag-info-location', dest='BAG_INFO_LOCATIONS',
+                        action='append', default=[],
                         help='Locations of the bag-info YAML/JSON files')
-    parser.add_argument('--assets-token', dest='assets_token',
+    parser.add_argument('--assets-token', dest='ASSETS_TOKEN',
                         help='Private token, to be used when fetching assets')
-    parser.add_argument('--assets-token-name', dest='assets_token_name',
+    parser.add_argument('--assets-token-name', dest='ASSETS_TOKEN_NAME', default='PRIVATE-TOKEN',
                         help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
-    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+    parser.add_argument('--overwrite', dest='OVERWRITE', action='store_true',
                         help='Overwrite existing Bag directory')
-    parser.add_argument('--log-level', dest='log_level',
+    parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
-    parser.add_argument('--log-file', dest='log_file',
+    parser.add_argument('--log-file', dest='LOG_FILE',
                         help='Path to the log file')
 
     return parser
 
 
-def main():
-    parser = create_parser()
-
-    settings.setup(parser, validate=[
-        'BAG_PATH'
-    ])
-
+def main(args):
     # setup the bag
     try:
-        bag_path = setup_assets_path(settings.BAG_PATH, remove_existing=settings.OVERWRITE)
+        bag_path = setup_assets_path(args.BAG_PATH, remove_existing=args.OVERWRITE)
     except FileExistsError:
-        parser.error(f'{settings.BAG_PATH} already exists.')
+        parser.error(f'{args.BAG_PATH} already exists.')
 
     # collect assets
-    fetch_files(settings.ASSETS, bag_path, headers={
-        settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
-    })
+    fetch_files(args.ASSETS, bag_path, headers={
+        args.ASSETS_TOKEN_NAME: args.ASSETS_TOKEN
+    } if args.ASSETS_TOKEN else {})
 
     # fetch bag-info
     bag_info = {}
-    for location in settings.BAG_INFO_LOCATIONS:
+    for location in args.BAG_INFO_LOCATIONS:
         bag_info.update(fetch_dict(location))
 
     # create bag using bagit
@@ -78,7 +73,7 @@ def main():
 
 
 def main_deprecated():
-    cli.cli_call_deprecated(main)
+    cli.cli_call_deprecated(__name__)
 
 
 if __name__ == "__main__":
