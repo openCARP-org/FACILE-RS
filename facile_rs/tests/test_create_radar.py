@@ -8,7 +8,8 @@ from facile_rs.create_radar import main
 SCRIPT_DIR = path.dirname(path.realpath(__file__))
 METADATA_DIR = path.join(path.dirname(SCRIPT_DIR), 'utils', 'metadata', 'tests')
 
-CODEMETA_LOCATION = path.join(METADATA_DIR, 'codemeta_test.json')
+CODEMETA_BASENAME = 'codemeta_test.json'
+CODEMETA_LOCATION = path.join(METADATA_DIR, CODEMETA_BASENAME)
 RADAR_URL = 'https://radar.kit.edu'
 RADAR_USERNAME = 'testuser'
 RADAR_PASSWORD = 'testpassword'
@@ -21,9 +22,11 @@ RADAR_BACKLINK = 'https://example.com'
 ASSETS = [CODEMETA_LOCATION, 'https://www.rfc-editor.org/rfc/rfc2606.txt']
 
 
-def test_error_radar_path_exists(monkeypatch, tmp_path, capsys):
+def test_error_radar_asset_exists(monkeypatch, tmp_path, capsys):
     radar_path = tmp_path / 'radar_path'
     radar_path.mkdir()
+    # Create a dummy file in the radar path to simulate an existing asset
+    (radar_path / CODEMETA_BASENAME).touch()
     monkeypatch.setattr('sys.argv',
                         [
                             sys.argv[0],
@@ -38,7 +41,8 @@ def test_error_radar_path_exists(monkeypatch, tmp_path, capsys):
                             '--radar-redirect-url', RADAR_REDIRECT_URL,
                             '--radar-email', RADAR_EMAIL,
                             '--radar-backlink', RADAR_BACKLINK,
-                            '--dry'
+                            '--dry',
+                            *ASSETS
                         ])
     with pytest.raises(SystemExit, match='^2$'):
         main()

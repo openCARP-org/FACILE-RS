@@ -27,7 +27,7 @@ def test_bag_path_exists(monkeypatch, tmp_path, capsys):
                         [
                             sys.argv[0],
                             '--bag-path', str(output_bag),
-                            '--datacite-path', str(DATACITE_LOCATION),
+                            '--datacite-location', str(DATACITE_LOCATION),
                         ])
     # Check that SystemExit is raised with error code 2
     with pytest.raises(SystemExit, match='^2$'):
@@ -50,7 +50,7 @@ def test_bag_cli(monkeypatch, tmp_path):
                         [
                             sys.argv[0],
                             '--bag-path', str(output_bag),
-                            '--datacite-path', str(DATACITE_LOCATION),
+                            '--datacite-location', str(DATACITE_LOCATION),
                             *assets
                         ])
     main()
@@ -73,7 +73,7 @@ def test_bag_env(monkeypatch, tmp_path):
     assets = [CODEMETA_LOCATION, CREATORS_LOCATIONS]
     monkeypatch.setenv('BAG_PATH', str(output_bag))
     monkeypatch.setenv('BAG_INFO_LOCATIONS', str(BAG_INFO))
-    monkeypatch.setenv('DATACITE_PATH', str(DATACITE_LOCATION))
+    monkeypatch.setenv('DATACITE_LOCATION', str(DATACITE_LOCATION))
     monkeypatch.setenv('ASSETS', ' '.join(assets))
     monkeypatch.setattr('sys.argv',
                         [

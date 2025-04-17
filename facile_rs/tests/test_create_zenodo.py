@@ -7,15 +7,18 @@ from facile_rs.create_zenodo import main
 SCRIPT_DIR = path.dirname(path.realpath(__file__))
 METADATA_DIR = path.join(path.dirname(SCRIPT_DIR), 'utils', 'metadata', 'tests')
 
-CODEMETA_LOCATION = path.join(METADATA_DIR, 'codemeta_test.json')
+CODEMETA_BASENAME = 'codemeta_test.json'
+CODEMETA_LOCATION = path.join(METADATA_DIR, CODEMETA_BASENAME)
 CREATORS_LOCATIONS = path.join(METADATA_DIR, 'codemeta_authors_test.json')
 CONTRIBUTORS_LOCATIONS = path.join(METADATA_DIR, 'codemeta_contributors_test.json')
 ASSETS = [path.join(METADATA_DIR, 'codemeta_test.json'), '']
 
 
-def test_error_zenodo_path_exists(monkeypatch, tmp_path, capsys):
+def test_error_zenodo_asset_exists(monkeypatch, tmp_path, capsys):
     zenodo_path = tmp_path / 'zenodo_path'
     zenodo_path.mkdir()
+    # Create a dummy file in the zenodo path to simulate an existing asset
+    (zenodo_path / CODEMETA_BASENAME).touch()
     monkeypatch.setattr('sys.argv',
                         [
                             sys.argv[0],
@@ -23,7 +26,8 @@ def test_error_zenodo_path_exists(monkeypatch, tmp_path, capsys):
                             '--zenodo-path', str(zenodo_path),
                             '--zenodo-url', 'https://sandbox.zenodo.org',
                             '--zenodo-token', '1234567890',
-                            '--dry'
+                            '--dry',
+                            *ASSETS
                         ])
     with pytest.raises(SystemExit, match='^2$'):
         main()
