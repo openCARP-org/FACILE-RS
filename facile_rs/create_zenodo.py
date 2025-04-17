@@ -23,6 +23,7 @@ Usage
 import argparse
 
 from .utils import cli, settings, setup_assets_path, setup_tmp_assets_path
+from .utils.exceptions import AssetExistsError
 from .utils.http import fetch_files
 from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, ZenodoMetadata
@@ -43,7 +44,7 @@ def create_parser(add_help=True):
                         help='Do not sort authors alphabetically, keep order in codemeta.json file')
     parser.set_defaults(sort_authors=True)
     parser.add_argument('--zenodo-path', dest='zenodo_path',
-                        help='Path to the local directory, where the assets are collected before upload.')
+                        help='Path to the local directory, where the assets are collected before upload. Optional: if not provided, a temporary directory is used.')
     parser.add_argument('--zenodo-url', dest='zenodo_url',
                         help='URL of the Zenodo service. Test environment available at https://sandbox.zenodo.org')
     parser.add_argument('--zenodo-token', dest='zenodo_token',
@@ -59,7 +60,7 @@ def create_parser(add_help=True):
     parser.add_argument('--dry', action='store_true',
                         help='Perform a dry run, do not upload anything.')
     parser.add_argument('--overwrite', dest='overwrite', action='store_true',
-                        help='Overwrite existing local directory')
+                        help='Overwrite existing local assets.')
     parser.add_argument('--log-level', dest='log_level',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
     parser.add_argument('--log-file', dest='log_file',
@@ -76,14 +77,20 @@ def main():
         'ZENODO_TOKEN'
     ])
 
-    # setup the bag directory
+    # setup the zenodo directory
     if settings.ZENODO_PATH is None:
         zenodo_path, tmp_dir = setup_tmp_assets_path()
     else:
-        try:
-            zenodo_path = setup_assets_path(settings.ZENODO_PATH, settings.OVERWRITE)
-        except FileExistsError:
-            parser.error(f'{settings.ZENODO_PATH} already exists.')
+        zenodo_path = setup_assets_path(settings.ZENODO_PATH, exist_ok=True)
+
+    # collect assets
+    try:
+        fetch_files(settings.ASSETS, zenodo_path, headers={
+            settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
+        }, overwrite=settings.OVERWRITE)
+    except AssetExistsError as e:
+        parser.error(f'Could not fetch {e.location}. File {e.file_path} already exists. '
+                      'Use --overwrite to overwrite assets.')
 
     # prepare Zenodo payload
     codemeta = CodemetaMetadata()
@@ -100,11 +107,6 @@ def main():
 
     zenodo_metadata = ZenodoMetadata(codemeta.data)
     zenodo_dict = zenodo_metadata.as_dict()
-
-    # collect assets
-    fetch_files(settings.ASSETS, zenodo_path, headers={
-        settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
-    })
 
     if not settings.DRY:
         # update or create Zenodo dataset

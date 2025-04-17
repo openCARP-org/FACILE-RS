@@ -53,7 +53,7 @@ def create_parser(add_help=True):
 def main(args):
     # setup the bag
     try:
-        bag_path = setup_assets_path(args.BAG_PATH, args.OVERWRITE)
+        bag_path = setup_assets_path(args.BAG_PATH, remove_existing=args.OVERWRITE)
     except FileExistsError:
         parser.error(f'{args.BAG_PATH} already exists.')
 

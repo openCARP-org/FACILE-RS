@@ -23,6 +23,7 @@ Usage
 import argparse
 
 from .utils import cli, settings, setup_assets_path, setup_tmp_assets_path
+from .utils.exceptions import AssetExistsError
 from .utils.http import fetch_files
 from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, RadarMetadata
@@ -43,7 +44,7 @@ def create_parser(add_help=True):
                         help='Do not sort authors alphabetically, keep order in codemeta.json file')
     parser.set_defaults(sort_authors=True)
     parser.add_argument('--radar-path', dest='radar_path',
-                        help='Path to the local directory, where the assets are collected before upload.')
+                        help='Path to the local directory, where the assets are collected before upload. Optional: if not provided, a temporary directory is used.')
     parser.add_argument('--radar-url', dest='radar_url',
                         help='URL of the RADAR service.')
     parser.add_argument('--radar-username', dest='radar_username',
@@ -73,7 +74,7 @@ def create_parser(add_help=True):
     parser.add_argument('--dry', action='store_true',
                         help='Perform a dry run, do not upload anything.')
     parser.add_argument('--overwrite', dest='overwrite', action='store_true',
-                        help='Overwrite existing local directory')
+                        help='Overwrite existing local assets.')
     parser.add_argument('--log-level', dest='log_level',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
     parser.add_argument('--log-file', dest='log_file',
@@ -101,10 +102,16 @@ def main():
     if settings.RADAR_PATH is None:
         radar_path, tmp_dir = setup_tmp_assets_path()
     else:
-        try:
-            radar_path = setup_assets_path(settings.RADAR_PATH, settings.OVERWRITE)
-        except FileExistsError:
-            parser.error(f'{settings.RADAR_PATH} already exists.')
+        radar_path = setup_assets_path(settings.RADAR_PATH, exist_ok=True)
+
+    # collect assets
+    try:
+        fetch_files(settings.ASSETS, radar_path, headers={
+            settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
+        }, overwrite=settings.OVERWRITE)
+    except AssetExistsError as e:
+        parser.error(f'Could not fetch {e.location}. File {e.file_path} already exists. '
+                      'Use --overwrite to overwrite assets.')
 
     # prepare radar payload
     codemeta = CodemetaMetadata()
@@ -125,11 +132,6 @@ def main():
 
     radar_metadata = RadarMetadata(codemeta.data, settings.RADAR_EMAIL, settings.RADAR_BACKLINK)
     radar_dict = radar_metadata.as_dict()
-
-    # collect assets
-    fetch_files(settings.ASSETS, radar_path, headers={
-        settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
-    })
 
     if not settings.DRY:
         # obtain oauth token

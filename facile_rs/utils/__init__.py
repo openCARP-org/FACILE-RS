@@ -75,11 +75,11 @@ class Settings:
 settings = Settings()
 
 
-def setup_assets_path(assets_path, overwrite=False):
+def setup_assets_path(assets_path, remove_existing=False, exist_ok=False):
     path = Path(assets_path).expanduser()
-    if overwrite:
+    if remove_existing:
         shutil.rmtree(path)
-    path.mkdir(parents=True)
+    path.mkdir(parents=True, exist_ok=exist_ok)
     return path
 
 
