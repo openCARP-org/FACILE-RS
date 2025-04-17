@@ -2,7 +2,7 @@ import pytest
 import sys
 from os import path
 
-from facile_rs.create_bag import main
+from facile_rs.main import main
 from facile_rs.utils.http import fetch_dict
 
 
@@ -24,6 +24,8 @@ def test_bag_path_exists(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr('sys.argv',
                         [
                             sys.argv[0],
+                            'bag',
+                            'create',
                             '--bag-path', str(output_bag)
                         ])
     # Check that SystemExit is raised with error code 2
@@ -45,6 +47,8 @@ def test_bag_cli(monkeypatch, tmp_path):
     monkeypatch.setattr('sys.argv',
                         [
                             sys.argv[0],
+                            'bag',
+                            'create',
                             '--bag-path', str(output_bag),
                             *assets
                         ])
@@ -69,6 +73,8 @@ def test_bag_env(monkeypatch, tmp_path):
     monkeypatch.setattr('sys.argv',
                         [
                             sys.argv[0],
+                            'bag',
+                            'create'
                         ])
     main()
     assert output_bag.exists()

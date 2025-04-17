@@ -18,13 +18,15 @@ Usage
 
 """
 
-import argparse
+import logging
+import sys
 
 import bagit
 
 from .utils import cli, settings, setup_assets_path
 from .utils.http import fetch_dict, fetch_files
 
+logger = logging.getLogger(__file__)
 
 def create_parser(add_help=True):
     parser = cli.Parser(add_help=add_help)
@@ -55,7 +57,10 @@ def main(args):
     try:
         bag_path = setup_assets_path(args.BAG_PATH, remove_existing=args.OVERWRITE)
     except FileExistsError:
-        parser.error(f'{args.BAG_PATH} already exists.')
+        error_msg = f'Error: "{args.BAG_PATH}" already exists. Please remove it or use --overwrite to replace it.'
+        sys.stderr.write(error_msg + '\n')
+        logger.error(error_msg)
+        sys.exit(2)
 
     # collect assets
     fetch_files(args.ASSETS, bag_path, headers={
