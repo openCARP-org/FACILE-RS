@@ -212,6 +212,15 @@ class ZenodoMetadata:
                 if not id_found:
                     out_entry['affiliations'].append({'name': affiliation.get('name', '')})
         return out_entry
+    
+    def person_or_org_to_string(self, zenodo_person_or_org):
+        """
+        Convert a Zenodo person_or_org object to a string containing its name.
+        """
+        res = zenodo_person_or_org.get('name', '')
+        if zenodo_person_or_org.get('type') == 'personal':
+            res = f"{zenodo_person_or_org.get('given_name', '')} {zenodo_person_or_org.get('family_name', '')}"
+        return res
 
     def validate_funding_identifier(self, funding_identifier):
         """
@@ -424,7 +433,7 @@ class ZenodoMetadata:
             related_id = self.to_related_identifier(self.data['referencePublication']['@id'], 'isdocumentedby')
             self.add_to_array_field(zenodo_dict, 'related_identifiers', related_id)
 
-        if 'codeRepository' in self.data:
+        if 'codeRepository' in self.data and self.data['codeRepository']:
             related_id = self.to_related_identifier(self.data['codeRepository'], 'issupplementto')
             self.add_to_array_field(zenodo_dict, 'related_identifiers', related_id)
 
@@ -451,6 +460,7 @@ class ZenodoMetadata:
         if 'publisher' in self.data:
             zenodo_publisher = self.to_person_or_org(self.data['publisher'], 'distributor')
             self.add_to_array_field(zenodo_dict, 'contributors', zenodo_publisher)
+            zenodo_dict['metadata']['publisher'] = self.person_or_org_to_string(zenodo_publisher.get('person_or_org', {}))
 
         # Put it in "keywords" as no field seems to correspond
         if 'applicationCategory' in self.data:

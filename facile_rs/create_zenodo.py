@@ -22,11 +22,11 @@ Usage
 
 import argparse
 import json
-import smtplib
-from pathlib import Path
 
-from .utils import cli, settings
+from .utils import cli, settings, setup_assets_path, setup_tmp_assets_path
+from .utils.exceptions import AssetExistsError
 from .utils.http import fetch_files
+from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, ZenodoMetadata
 from .utils.zenodo import create_zenodo_dataset, update_zenodo_dataset, upload_zenodo_assets
 
@@ -45,7 +45,7 @@ def create_parser(add_help=True):
                         help='Do not sort authors alphabetically, keep order in codemeta.json file')
     parser.set_defaults(sort_authors=True)
     parser.add_argument('--zenodo-path', dest='zenodo_path',
-                        help='Path to the directory where the assets are collected before upload to Zenodo.')
+                        help='Path to the local directory, where the assets are collected before upload. Optional: if not provided, a temporary directory is used.')
     parser.add_argument('--zenodo-url', dest='zenodo_url',
                         help='URL of the Zenodo service. Test environment available at https://sandbox.zenodo.org')
     parser.add_argument('--zenodo-token', dest='zenodo_token',
@@ -60,6 +60,8 @@ def create_parser(add_help=True):
                         help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
     parser.add_argument('--dry', action='store_true',
                         help='Perform a dry run, do not upload anything.')
+    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+                        help='Overwrite existing local assets.')
     parser.add_argument('--log-level', dest='log_level',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
     parser.add_argument('--log-file', dest='log_file',
@@ -72,16 +74,24 @@ def main():
 
     settings.setup(parser, validate=[
         'CODEMETA_LOCATION',
-        'ZENODO_PATH',
         'ZENODO_URL',
         'ZENODO_TOKEN'
     ])
 
-    # setup the bag directory
-    zenodo_path = Path(settings.ZENODO_PATH).expanduser()
-    if zenodo_path.exists():
-        parser.error(f'{zenodo_path} already exists.')
-    zenodo_path.mkdir()
+    # setup the zenodo directory
+    if settings.ZENODO_PATH is None:
+        zenodo_path, tmp_dir = setup_tmp_assets_path()
+    else:
+        zenodo_path = setup_assets_path(settings.ZENODO_PATH, exist_ok=True)
+
+    # collect assets
+    try:
+        fetch_files(settings.ASSETS, zenodo_path, headers={
+            settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
+        }, overwrite=settings.OVERWRITE)
+    except AssetExistsError as e:
+        parser.error(f'Could not fetch {e.location}. File {e.file_path} already exists. '
+                      'Use --overwrite to overwrite assets.')
 
     # prepare Zenodo payload
     codemeta = CodemetaMetadata()
@@ -99,11 +109,6 @@ def main():
     zenodo_metadata = ZenodoMetadata(codemeta.data)
     zenodo_dict = zenodo_metadata.as_dict()
 
-    # collect assets
-    fetch_files(settings.ASSETS, zenodo_path, headers={
-        settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
-    })
-
     if not settings.DRY:
         # update or create Zenodo dataset
         zenodo_id = None
@@ -113,31 +118,27 @@ def main():
                     zenodo_id = identifier['value']
 
         if zenodo_id:
-            print('zenodo_id:', zenodo_id)
             dataset_id = update_zenodo_dataset(settings.ZENODO_URL, zenodo_id, settings.ZENODO_TOKEN, zenodo_dict)
         else:
-            print(zenodo_id, 'not found')
             dataset_id = create_zenodo_dataset(settings.ZENODO_URL, settings.ZENODO_TOKEN, zenodo_dict)
 
         # upload assets
         upload_zenodo_assets(settings.ZENODO_URL, dataset_id, settings.ZENODO_TOKEN, settings.ASSETS, zenodo_path)
 
         if settings.SMTP_SERVER and settings.NOTIFICATION_EMAIL:
-            message = """\
-    From: {}
-    To: {}
-    Subject: {}
+            zenodo_url = f'{settings.ZENODO_URL}/uploads/{dataset_id}'
 
-    {}
-    """.format(
-        settings.NOTIFICATION_EMAIL,
-        settings.NOTIFICATION_EMAIL,
-        "New Zenodo release ready to publish",
-        "A new Zenodo release has been uploaded by a CI pipeline.\n\n Please visit"
-        f" {settings.ZENODO_URL}/uploads/{dataset_id} to publish this release.")
-            server = smtplib.SMTP(settings.SMTP_SERVER)
-            server.sendmail(settings.NOTIFICATION_EMAIL, settings.NOTIFICATION_EMAIL, message)
-            server.quit()
+            send_mail(
+                settings.SMTP_SERVER, settings.NOTIFICATION_EMAIL, settings.NOTIFICATION_EMAIL,
+                'New Zenodo release ready to publish',
+                'A new Zenodo release has been uploaded by a CI pipeline.\n\n'
+                f'Please visit {zenodo_url} to publish this release.'
+            )
+
+    try:
+        tmp_dir.cleanup()
+    except UnboundLocalError:
+        pass
 
     else:
         print(json.dumps(zenodo_dict))

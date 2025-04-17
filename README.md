@@ -122,13 +122,13 @@ Deprecated alias: `create_release`
 
 ### `facile-rs radar prepare`
 
-Creates an empty archive in the [RADAR service](https://www.radar-service.eu) in order to "reserve" a DOI and an ID in RADAR. Both are stored in the CodeMeta file and can be used by the `create_radar` command below to include the DOI for this release in the deposited CodeMeta file. A detailed HowTo for releasing datasets on RADAR is provided in the file [`HOWTO_release_radar.md`](https://git.opencarp.org/openCARP/FACILE-RS/-/blob/master/HOWTO_release_radar.md) in this directory.
+Creates an empty archive in the [RADAR service](https://www.radar-service.eu) in order to "reserve" a DOI and an ID in RADAR. Both are stored in the CodeMeta file and can be used by the `create_radar` command below to include the DOI for this release in the deposited CodeMeta file. A detailed HowTo for releasing datasets on RADAR is provided in the tutorial [`03_release_radar.md`](./docs/tutorials/03_release_radar.md).
 
 Deprecated alias: `prepare_radar`
 
 ### `facile-rs radar upload`
 
-Creates an archive in the [RADAR service](https://www.radar-service.eu) and uploads the assets provided as positional arguments. The metadata is created similar to `create_datacite`. If the RADAR ID is already in the CodeMeta file, the existing archive is updated instead. A detailed HowTo for releasing datasets on RADAR is provided in the file `HOWTO_release_radar.md` in this directory.
+Creates an archive in the [RADAR service](https://www.radar-service.eu) and uploads the assets provided as positional arguments. The metadata is created similar to `create_datacite`. If the RADAR ID is already in the CodeMeta file, the existing archive is updated instead. A detailed HowTo for releasing datasets on RADAR is provided in the tutorial [`03_release_radar.md`](./docs/tutorials/03_release_radar.md).
 
 Deprecated alias: `create_radar`
 

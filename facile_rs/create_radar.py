@@ -22,11 +22,11 @@ Usage
 
 import argparse
 import json
-import smtplib
-from pathlib import Path
 
-from .utils import cli, settings
+from .utils import cli, settings, setup_assets_path, setup_tmp_assets_path
+from .utils.exceptions import AssetExistsError
 from .utils.http import fetch_files
+from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, RadarMetadata
 from .utils.radar import create_radar_dataset, fetch_radar_token, update_radar_dataset, upload_radar_assets
 
@@ -45,7 +45,7 @@ def create_parser(add_help=True):
                         help='Do not sort authors alphabetically, keep order in codemeta.json file')
     parser.set_defaults(sort_authors=True)
     parser.add_argument('--radar-path', dest='radar_path',
-                        help='Path to the Radar directory, where the assets are collected before upload.')
+                        help='Path to the local directory, where the assets are collected before upload. Optional: if not provided, a temporary directory is used.')
     parser.add_argument('--radar-url', dest='radar_url',
                         help='URL of the RADAR service.')
     parser.add_argument('--radar-username', dest='radar_username',
@@ -74,6 +74,8 @@ def create_parser(add_help=True):
                         help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
     parser.add_argument('--dry', action='store_true',
                         help='Perform a dry run, do not upload anything.')
+    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+                        help='Overwrite existing local assets.')
     parser.add_argument('--log-level', dest='log_level',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
     parser.add_argument('--log-file', dest='log_file',
@@ -86,7 +88,6 @@ def main():
 
     settings.setup(parser, validate=[
         'CODEMETA_LOCATION',
-        'RADAR_PATH',
         'RADAR_URL',
         'RADAR_CLIENT_ID',
         'RADAR_CLIENT_SECRET',
@@ -98,11 +99,20 @@ def main():
         'RADAR_BACKLINK'
     ])
 
-    # setup the bag directory
-    radar_path = Path(settings.RADAR_PATH).expanduser()
-    if radar_path.exists():
-        parser.error(f'{radar_path} already exists.')
-    radar_path.mkdir()
+    # setup the radar directory
+    if settings.RADAR_PATH is None:
+        radar_path, tmp_dir = setup_tmp_assets_path()
+    else:
+        radar_path = setup_assets_path(settings.RADAR_PATH, exist_ok=True)
+
+    # collect assets
+    try:
+        fetch_files(settings.ASSETS, radar_path, headers={
+            settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
+        }, overwrite=settings.OVERWRITE)
+    except AssetExistsError as e:
+        parser.error(f'Could not fetch {e.location}. File {e.file_path} already exists. '
+                      'Use --overwrite to overwrite assets.')
 
     # prepare radar payload
     codemeta = CodemetaMetadata()
@@ -124,11 +134,6 @@ def main():
     radar_metadata = RadarMetadata(codemeta.data, settings.RADAR_EMAIL, settings.RADAR_BACKLINK)
     radar_dict = radar_metadata.as_dict()
 
-    # collect assets
-    fetch_files(settings.ASSETS, radar_path, headers={
-        settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
-    })
-
     if not settings.DRY:
         # obtain oauth token
         headers = fetch_radar_token(settings.RADAR_URL, settings.RADAR_CLIENT_ID, settings.RADAR_CLIENT_SECRET,
@@ -146,23 +151,19 @@ def main():
         print(json.dumps(radar_dict))
 
     if settings.SMTP_SERVER and settings.NOTIFICATION_EMAIL:
-        message = """\
-From: {}
-To: {}
-Subject: {}
+        radar_url = f'{settings.RADAR_URL}/radar/de/workspace/{settings.RADAR_WORKSPACE_ID}.{settings.RADAR_CLIENT_ID}'
 
-{}
-""".format(
-    settings.RADAR_EMAIL,
-    settings.NOTIFICATION_EMAIL,
-    "New RADAR release ready to publish",
-    "A new RADAR release has been uploaded by a CI pipeline.\n\n Please visit"
-    " https://radar.kit.edu/radar/de/workspace/{}.{} to publish this release.".format(
-        settings.RADAR_WORKSPACE_ID,settings.RADAR_CLIENT_ID
-))
-        server = smtplib.SMTP(settings.SMTP_SERVER)
-        server.sendmail(settings.RADAR_EMAIL, settings.NOTIFICATION_EMAIL, message)
-        server.quit()
+        send_mail(
+            settings.SMTP_SERVER, settings.RADAR_EMAIL, settings.NOTIFICATION_EMAIL,
+            'New RADAR release ready to publish',
+            'A new RADAR release has been uploaded by a CI pipeline.\n\n'
+            f'Please visit {radar_url} to publish this release.'
+        )
+
+    try:
+        tmp_dir.cleanup()
+    except UnboundLocalError:
+        pass
 
 
 def main_deprecated():
