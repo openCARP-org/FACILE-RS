@@ -191,7 +191,7 @@ def cli_call_deprecated(module_name):
     :param func: The main function to call in the script.
     """
 
-    # create the deprecication warning
+    # create the deprecation warning
     module = sys.modules[module_name]
     script_name = module.__name__.split('.')[-1]
     warn(f"Calling {script_name} directly is deprecated. Use the entry point 'facile-rs' instead.", stacklevel=2)
