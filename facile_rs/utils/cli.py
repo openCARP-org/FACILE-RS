@@ -168,12 +168,19 @@ def create_parser():
     parser_datacite_create.set_defaults(module=create_datacite)
 
     # Parser for the 'bag' subcommand
-    parser_bag = subparsers.add_parser('bag', help='Generate and manage BagIt bags')
+    parser_bag = subparsers.add_parser(
+        'bag',
+        help='Generate and manage BagIt bags',
+        description='Generate and manage BagIt bags.'
+    )
     bag_subparsers = parser_bag.add_subparsers()
-    parser_bag_create = bag_subparsers.add_parser('create',
-                                                  help='Create a BagIt bag',
-                                                  parents=[create_bag.create_parser(add_help=False)],
-                                                  add_help=True)
+    parser_bag_create = bag_subparsers.add_parser(
+        'create',
+        help='Create a BagIt bag',
+        description='Create a BagIt bag.',
+        parents=[create_bag.create_parser(add_help=False)],
+        add_help=True
+    )
     parser_bag_create.set_defaults(module=create_bag)
 
     # Parser for the 'bagpack' subcommand
