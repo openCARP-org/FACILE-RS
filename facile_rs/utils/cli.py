@@ -57,17 +57,19 @@ class Parser(argparse.ArgumentParser):
     """
 
     def add_argument(self, *args, **kwargs):
+        env = kwargs.pop('env', True)
         argument = super().add_argument(*args, **kwargs)
 
         if not isinstance(argument, argparse._HelpAction):
             # update the default value for the argument with a possible environment variable
-            default = os.getenv(argument.dest)
-            if default is not None:
-                # if the argument is a list, split the default from the environment
-                if kwargs.get('nargs') == '*' or kwargs.get('action') == 'append':
-                    default = default.split()
+            if env:
+                default = os.getenv(argument.dest)
+                if default is not None:
+                    # if the argument is a list, split the default from the environment
+                    if kwargs.get('nargs') == '*' or kwargs.get('action') == 'append':
+                        default = default.split()
 
-                argument.default = default
+                    argument.default = default
 
             # remove the required argument if a default is set
             if argument.required and argument.default:

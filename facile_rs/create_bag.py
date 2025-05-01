@@ -38,7 +38,7 @@ def create_parser(add_help=True):
                         help='Private token, to be used when fetching assets')
     parser.add_argument('--assets-token-name', dest='ASSETS_TOKEN_NAME', default='PRIVATE-TOKEN',
                         help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
-    parser.add_argument('--overwrite', dest='OVERWRITE', action='store_true',
+    parser.add_argument('--overwrite', dest='OVERWRITE', action='store_true', env=False,
                         help='Overwrite existing Bag directory')
     parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
