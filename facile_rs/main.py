@@ -37,9 +37,6 @@ def main():
     parser = cli.create_parser()
     args = parser.parse_args()
 
-    # setup logs
-    cli.setup_logs(args.LOG_LEVEL, args.LOG_FILE)
-
     # Print help if subcommand is missing
     subcommand = args.subcommand
     if subcommand is None:
@@ -51,6 +48,9 @@ def main():
             subparser = parser.get_subparser(subcommand)
             subparser.print_help()
         else:
+            # setup logs
+            cli.setup_logs(args.LOG_LEVEL, args.LOG_FILE)
+
             # Call the "main" function of the module
             module.main(args)
 
