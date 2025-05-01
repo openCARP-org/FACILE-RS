@@ -57,7 +57,7 @@ dev = [
 repository = "https://git.opencarp.org/openCARP/FACILE-RS"
 
 [project.scripts]
-facile-rs = "facile_rs.main:main"
+facile-rs = "facile_rs.utils.cli:main"
 create_bag = "facile_rs.create_bag:main_deprecated"
 create_bagpack = "facile_rs.create_bagpack:main_deprecated"
 create_cff = "facile_rs.create_cff:main_deprecated"
