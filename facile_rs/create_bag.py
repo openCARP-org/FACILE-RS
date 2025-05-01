@@ -17,12 +17,10 @@ Usage
     :prog: create_bag.py
 
 """
-
-import argparse
-
 import bagit
 
-from .utils import cli, settings, setup_assets_path
+from .utils import cli, setup_assets_path
+from .utils.exceptions import ParserError
 from .utils.http import fetch_dict, fetch_files
 
 
@@ -54,8 +52,8 @@ def main(args):
     # setup the bag
     try:
         bag_path = setup_assets_path(args.BAG_PATH, remove_existing=args.OVERWRITE)
-    except FileExistsError:
-        parser.error(f'{args.BAG_PATH} already exists.')
+    except FileExistsError as e:
+        raise ParserError(f'{args.BAG_PATH} already exists. Please remove it or use --overwrite to replace it.') from e
 
     # collect assets
     fetch_files(args.ASSETS, bag_path, headers={

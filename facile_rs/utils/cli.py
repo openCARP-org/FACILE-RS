@@ -48,6 +48,7 @@ from facile_rs import (
     run_docstring_pipeline,
     run_markdown_pipeline,
 )
+from facile_rs.utils.exceptions import ParserError
 
 
 class Parser(argparse.ArgumentParser):
@@ -241,7 +242,10 @@ def main():
             setup_logs(args.LOG_LEVEL, args.LOG_FILE)
 
             # Call the "main" function of the module
-            module.main(args)
+            try:
+                module.main(args)
+            except ParserError as e:
+                parser.error(e)
 
 
 def cli_call_deprecated(module_name):
