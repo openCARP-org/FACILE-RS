@@ -20,6 +20,7 @@ Usage
 """
 
 import argparse
+import json
 from pathlib import Path
 
 from .utils import cli, settings
@@ -103,6 +104,8 @@ def main():
             Path(settings.CODEMETA_LOCATION).expanduser().write_text(codemeta.to_json())
         else:
             print(dataset)
+    else:
+        print(json.dumps(zenodo_dict))
 
 
 def main_deprecated():

@@ -137,3 +137,44 @@ def upload_zenodo_assets(zenodo_url, dataset_id, zenodo_token, assets, path):
         except requests.exceptions.HTTPError as e:
             print(response.text)
             raise e
+
+
+def delete_zenodo_dataset(zenodo_url, dataset_id, zenodo_token):
+    """
+    Delete a draft record from Zenodo.
+
+    :param zenodo_url: URL to the Zenodo repository
+    :param dataset_id: Zenodo record ID
+    :param zenodo_token: Zenodo personal token
+    """
+    url = zenodo_url + f'/api/records/{dataset_id}/draft'
+    headers = {
+        "Authorization": "Bearer " + zenodo_token
+    }
+    try:
+        response = requests.delete(url, headers=headers)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        print(response.text)
+        raise e
+
+
+def get_zenodo_dataset(zenodo_url, dataset_id, zenodo_token):
+    """
+    Get a record from Zenodo.
+
+    :param zenodo_url: URL to the Zenodo repository
+    :param dataset_id: Zenodo record ID
+    :param zenodo_token: Zenodo personal token
+    """
+    url = zenodo_url + f'/api/records/{dataset_id}/draft'
+    headers = {
+        "Authorization": "Bearer " + zenodo_token
+    }
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.HTTPError as e:
+        print(response.text)
+        raise e
