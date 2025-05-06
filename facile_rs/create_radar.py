@@ -21,6 +21,7 @@ Usage
 """
 
 import argparse
+import json
 
 from .utils import cli, settings, setup_assets_path, setup_tmp_assets_path
 from .utils.exceptions import AssetExistsError
@@ -146,6 +147,8 @@ def main():
 
         # upload assets
         upload_radar_assets(settings.RADAR_URL, dataset_id, headers, settings.ASSETS, radar_path)
+    else:
+        print(json.dumps(radar_dict))
 
     if settings.SMTP_SERVER and settings.NOTIFICATION_EMAIL:
         radar_url = f'{settings.RADAR_URL}/radar/de/workspace/{settings.RADAR_WORKSPACE_ID}.{settings.RADAR_CLIENT_ID}'

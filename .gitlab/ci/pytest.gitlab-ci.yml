@@ -2,9 +2,20 @@ test-install:
   stage: test
   image: python:$PYTHON_VERSION
   script:
-    - pip install -e .
-    - pip install pytest
+    - pip install -e .[test]
     - pytest -v
   parallel:
     matrix:
       - PYTHON_VERSION: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+test-coverage:
+  stage: test
+  image: python:3.11
+  script:
+    - pip install -e .[test]
+    - coverage run -m pytest
+    - coverage report -m
+    - coverage html
+  artifacts:
+    paths:
+      - htmlcov/

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-"""Create a release in GitLab using the GitLab API.
+"""Create a release in GitLab using the GitLab REST API.
 
 Description
 -----------
 
-This script creates a release in GitLab using the GitLab API.
+This script creates a release in GitLab using the GitLab REST API.
 A tag for the release needs to be created beforehand and provided to the script.
 
 Usage
@@ -19,6 +19,7 @@ Usage
 """
 
 import argparse
+import json
 import logging
 
 import requests
@@ -38,7 +39,7 @@ def create_parser(add_help=True):
     parser.add_argument('--release-description', dest='release_description',
                         help='Description for the release.')
     parser.add_argument('--release-api-url', dest='release_api_url',
-                        help='API URL to create the release.')
+                        help='API URL to create the release. Example: https://gitlab.com/api/v4/projects/123/releases')
     parser.add_argument('--private-token', dest='private_token',
                         help='The PRIVATE_TOKEN to be used with the GitLab API.')
     parser.add_argument('--dry', action='store_true',
@@ -59,6 +60,10 @@ def main():
         'RELEASE_API_URL',
         'PRIVATE_TOKEN'
     ])
+
+    if '/api/v4/projects/' not in settings.RELEASE_API_URL or '/releases' not in settings.RELEASE_API_URL:
+        logger.warning('Warning: the RELEASE_API_URL seems incorrect. '
+                       'It should be formed like: https://<gitlab_instance_url>/api/v4/projects/<project_id>/releases')
 
     assets = []
     for asset_location in settings.ASSETS:
@@ -81,7 +86,7 @@ def main():
         }
 
     if settings.DRY:
-        print(release_json)
+        print(json.dumps(release_json))
     else:
         logging.debug('release_json = %s', release_json)
         response = requests.post(settings.RELEASE_API_URL, headers={
