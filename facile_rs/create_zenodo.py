@@ -21,6 +21,7 @@ Usage
 """
 
 import argparse
+import json
 
 from .utils import cli, settings, setup_assets_path, setup_tmp_assets_path
 from .utils.exceptions import AssetExistsError
@@ -138,6 +139,9 @@ def main():
         tmp_dir.cleanup()
     except UnboundLocalError:
         pass
+
+    else:
+        print(json.dumps(zenodo_dict))
 
 
 def main_deprecated():

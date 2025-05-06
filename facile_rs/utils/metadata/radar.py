@@ -1,7 +1,7 @@
 import json
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 
 logger = logging.getLogger(__file__)
 
@@ -56,7 +56,7 @@ class RadarMetadata:
 
         :return: RADAR metadata dictionary
         """
-        archive_date = datetime.utcnow()
+        archive_date = datetime.now(timezone.utc)
 
         radar_dict = {
             'technicalMetadata': {
