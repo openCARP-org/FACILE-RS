@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Rename `--datacite-path` to `--datacite-location` in `facile-rs bagpack create` and allow for remote locations.
 - The "publisher" field in Zenodo metadata is now populated with the "publisher" name provided in the Codemeta file.
 
+### Changed
+- The option `--overwrite` is not read from environment anymore: it shall be passed from the command line.
+
 ### Fixed
 - Fix remove-doubles when name is given as givenName and familyName.
 
