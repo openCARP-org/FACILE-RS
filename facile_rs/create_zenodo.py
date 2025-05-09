@@ -86,8 +86,6 @@ def main(args):
         raise ParserError(f'Could not fetch {e.location}. File {e.file_path} already exists. '
                            'Use --overwrite to overwrite assets.') from e
 
-    print(args)
-
     # prepare Zenodo payload
     codemeta = CodemetaMetadata()
     codemeta.fetch(args.CODEMETA_LOCATION)

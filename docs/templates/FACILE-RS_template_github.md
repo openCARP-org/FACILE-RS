@@ -92,7 +92,7 @@ With this configuration, we will restrict the creation and modification of relea
   - In Target tags, click on Add target > Include by pattern and add the pattern `v*`. Then do the same for the pattern `pre-v*`.
   - Mark the following tag rules: Restrict creations, Restrict update, Restrict deletions, Block force pushes.
 - Create an environment for FACILE-RS secrets:
-  - go to Settings > Environments > New environment, and create an environment named `facile-rs`. 
+  - go to Settings > Environments > New environment, and create an environment named `facile-rs`.
   - In "Deployment branch and tags", select "Selected branches and tags" and click on "Add deployment branch or tag rule" to add your release branch (for example `main`) and the release tags patterns (`pre-v*` and `v*`)
   - Note: you can add secrets needed by FACILE-RS inside this environment to make them only accessible via the release branch and tags (for example: ZENODO_TOKEN, RADAR_PASSWORD, ...).
 - Create a Deploy key, which will allow GitHub Actions to trigger release workflows:

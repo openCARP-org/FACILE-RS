@@ -33,7 +33,7 @@ def test_cli(monkeypatch, tmpdir):
 
 def test_env(monkeypatch, tmpdir):
     """
-    Test the CFF file creation using environment variables    
+    Test the CFF file creation using environment variables
     """
     output_cff = tmpdir.join('output.cff')
     monkeypatch.setenv('CODEMETA_LOCATION', CODEMETA_LOCATION)
@@ -52,7 +52,7 @@ def test_env(monkeypatch, tmpdir):
 
 def test_stdout(monkeypatch, capsys):
     """
-    Test the CFF ouput to stdout
+    Test the CFF output to stdout
     """
     # Ensure no CFF_PATH environment variable is set
     monkeypatch.delenv('CFF_PATH', raising=False)

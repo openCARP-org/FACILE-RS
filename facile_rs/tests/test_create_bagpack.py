@@ -1,11 +1,11 @@
 import filecmp
-import pytest
 import sys
 from os import path
 
+import pytest
+
 from facile_rs.utils.cli import main
 from facile_rs.utils.http import fetch_dict
-
 
 SCRIPT_DIR = path.dirname(path.realpath(__file__))
 METADATA_DIR = path.join(path.dirname(SCRIPT_DIR), 'utils', 'metadata', 'tests')

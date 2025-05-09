@@ -146,4 +146,3 @@ git push origin pre-v0.0.2
 
 A GitLab release of your software will be created, and in addition, the release will be associated with a DOI and uploaded to RADAR.
 Once the workflow has run, you can log in to your RADAR instance to review and publish your software release.
-
