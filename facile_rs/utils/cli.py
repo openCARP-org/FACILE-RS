@@ -98,7 +98,7 @@ def create_parser():
     # Main parser
     parser = Parser(prog='facile-rs',
         description="FACILE-RS command-line tool, to perform metadata conversion and software publication" \
-            "based on CodeMeta metadata.",
+            " based on CodeMeta metadata.",
         epilog="Get help on a subcommand by running 'facile-rs <subcommand> -h'.")
 
     # Parsers for the subcommands
