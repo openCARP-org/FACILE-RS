@@ -3,7 +3,7 @@ import sys
 from datetime import date
 from os import path
 
-from facile_rs.main import main
+from facile_rs.utils.cli import main
 
 
 RELEASE_TAG = 'v0.1.0'

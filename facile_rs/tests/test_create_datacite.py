@@ -1,7 +1,7 @@
 import sys
 from os import path
 
-from facile_rs.main import main
+from facile_rs.utils.cli import main
 
 SCRIPT_DIR = path.dirname(path.realpath(__file__))
 METADATA_DIR = path.join(path.dirname(SCRIPT_DIR), 'utils', 'metadata', 'tests')

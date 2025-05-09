@@ -27,8 +27,6 @@ Usage
     :prog: run_markdown_pipeline.py
 
 """
-
-import argparse
 import json
 import logging
 from pathlib import Path
@@ -36,40 +34,32 @@ from pathlib import Path
 import frontmatter
 import yaml
 
-from .utils import cli, settings
+from .utils import cli
 from .utils.grav import collect_pages
 
 logger = logging.getLogger(__file__)
 
 
 def create_parser(add_help=True):
-    parser = argparse.ArgumentParser(add_help=add_help)
+    parser = cli.Parser(add_help=add_help)
 
-    parser.add_argument('--grav-path', dest='grav_path',
+    parser.add_argument('--grav-path', dest='GRAV_PATH', required=True,
                         help='Path to the grav repository directory.')
-    parser.add_argument('--pipeline', dest='pipeline',
+    parser.add_argument('--pipeline', dest='PIPELINE', required=True,
                         help='Name of the pipeline as specified in the GRAV metadata.')
-    parser.add_argument('--pipeline-source', dest='pipeline_source',
+    parser.add_argument('--pipeline-source', dest='PIPELINE_SOURCE', required=True,
                         help='Path to the source directory for the pipeline.')
-    parser.add_argument('--log-level', dest='log_level',
+    parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
-    parser.add_argument('--log-file', dest='log_file',
+    parser.add_argument('--log-file', dest='LOG_FILE',
                         help='Path to the log file')
     return parser
 
 
-def main():
-    parser = create_parser()
-
-    settings.setup(parser, validate=[
-        'GRAV_PATH',
-        'PIPELINE',
-        'PIPELINE_SOURCE'
-    ])
-
+def main(args):
     # loop over the tagged pages and write the content into the files
-    for page_path, page, source in collect_pages(settings.GRAV_PATH, settings.PIPELINE):
-        source_path = Path(settings.PIPELINE_SOURCE).expanduser() / source
+    for page_path, page, source in collect_pages(args.GRAV_PATH, args.PIPELINE):
+        source_path = Path(args.PIPELINE_SOURCE).expanduser() / source
 
         # read the source file
         if source_path.suffix in ['.json']:
@@ -89,7 +79,7 @@ def main():
 
 
 def main_deprecated():
-    cli.cli_call_deprecated(main)
+    cli.main_deprecated(__name__)
 
 
 if __name__ == "__main__":
