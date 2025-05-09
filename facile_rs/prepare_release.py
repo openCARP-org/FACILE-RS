@@ -14,48 +14,41 @@ Usage
    :prog: prepare_release.py
 
 """
-
-import argparse
 from datetime import date
 from pathlib import Path
 
-from .utils import cli, settings
+from .utils import cli
 from .utils.metadata import CodemetaMetadata
 
 
 def create_parser(add_help=True):
-    parser = argparse.ArgumentParser(add_help=add_help)
-    parser.add_argument('--codemeta-location', dest='codemeta_location',
+    parser = cli.Parser(add_help=add_help)
+
+    parser.add_argument('--codemeta-location', dest='CODEMETA_LOCATION', required=True,
                         help='Location of the main codemeta.json JSON file')
-    parser.add_argument('--version', dest='version',
+    parser.add_argument('--version', dest='VERSION', required=True,
                         help='Version of the resource')
-    parser.add_argument('--date', dest='date',
+    parser.add_argument('--date', dest='DATE',
                         help='Date for dateModified (format: \'%%Y-%%m-%%d\')')
-    parser.add_argument('--log-level', dest='log_level',
+    parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
-    parser.add_argument('--log-file', dest='log_file',
+    parser.add_argument('--log-file', dest='LOG_FILE',
                         help='Path to the log file')
     return parser
 
-def main():
-    parser = create_parser()
 
-    settings.setup(parser, validate=[
-        'CODEMETA_LOCATION',
-        'VERSION'
-    ])
-
+def main(args):
     codemeta = CodemetaMetadata()
-    codemeta.fetch(settings.CODEMETA_LOCATION)
+    codemeta.fetch(args.CODEMETA_LOCATION)
 
-    codemeta.data['version'] = settings.VERSION
-    codemeta.data['dateModified'] = settings.DATE or date.today().strftime('%Y-%m-%d')
+    codemeta.data['version'] = args.VERSION
+    codemeta.data['dateModified'] = args.DATE or date.today().strftime('%Y-%m-%d')
 
-    Path(settings.CODEMETA_LOCATION).expanduser().write_text(codemeta.to_json())
+    Path(args.CODEMETA_LOCATION).expanduser().write_text(codemeta.to_json())
 
 
 def main_deprecated():
-    cli.cli_call_deprecated(main)
+    cli.cli_call_deprecated(__name__)
 
 
 if __name__ == "__main__":

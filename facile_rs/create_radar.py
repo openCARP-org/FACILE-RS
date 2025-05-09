@@ -19,12 +19,10 @@ Usage
     :prog: create_radar.py
 
 """
-
-import argparse
 import json
 
-from .utils import cli, settings, setup_assets_path, setup_tmp_assets_path
-from .utils.exceptions import AssetExistsError
+from .utils import cli, setup_assets_path, setup_tmp_assets_path
+from .utils.exceptions import AssetExistsError, ParserError
 from .utils.http import fetch_files
 from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, RadarMetadata
@@ -32,96 +30,84 @@ from .utils.radar import create_radar_dataset, fetch_radar_token, update_radar_d
 
 
 def create_parser(add_help=True):
-    parser = argparse.ArgumentParser(add_help=add_help)
-    parser.add_argument('assets', nargs='*', default=[],
+    parser = cli.Parser(add_help=add_help)
+
+    parser.add_argument('ASSETS', nargs='*', default=[],
                         help='Assets to be added to the repository.')
-    parser.add_argument('--codemeta-location', dest='codemeta_location',
+    parser.add_argument('--codemeta-location', dest='CODEMETA_LOCATION', required=True,
                         help='Location of the main codemeta.json JSON file')
-    parser.add_argument('--creators-locations', '--creators-location', dest='creators_locations', action='append', default=[],
+    parser.add_argument('--creators-locations', '--creators-location', dest='CREATORS_LOCATIONS',
+                        action='append', default=[],
                         help='Locations of codemeta JSON files for additional creators')
-    parser.add_argument('--contributors-locations', '--contributors-location', dest='contributors_locations', action='append', default=[],
+    parser.add_argument('--contributors-locations', '--contributors-location', dest='CONTRIBUTORS_LOCATIONS',
+                        action='append', default=[],
                         help='Locations of codemeta JSON files for additional contributors')
-    parser.add_argument('--no-sort-authors', dest='sort_authors', action='store_false',
+    parser.add_argument('--no-sort-authors', dest='SORT_AUTHORS', action='store_false', default=True,
                         help='Do not sort authors alphabetically, keep order in codemeta.json file')
-    parser.set_defaults(sort_authors=True)
-    parser.add_argument('--radar-path', dest='radar_path',
-                        help='Path to the local directory, where the assets are collected before upload. Optional: if not provided, a temporary directory is used.')
-    parser.add_argument('--radar-url', dest='radar_url',
+    parser.add_argument('--radar-path', dest='RADAR_PATH',
+                        help='Path to the local directory, where the assets are collected before upload. '
+                             'Optional: if not provided, a temporary directory is used.')
+    parser.add_argument('--radar-url', dest='RADAR_URL', required=True,
                         help='URL of the RADAR service.')
-    parser.add_argument('--radar-username', dest='radar_username',
+    parser.add_argument('--radar-username', dest='RADAR_USERNAME', required=True,
                         help='Username for the RADAR service.')
-    parser.add_argument('--radar-password', dest='radar_password',
+    parser.add_argument('--radar-password', dest='RADAR_PASSWORD', required=True,
                         help='Password for the RADAR service.')
-    parser.add_argument('--radar-client-id', dest='radar_client_id',
+    parser.add_argument('--radar-client-id', dest='RADAR_CLIENT_ID', required=True,
                         help='Client ID for the RADAR service.')
-    parser.add_argument('--radar-client-secret', dest='radar_client_secret',
+    parser.add_argument('--radar-client-secret', dest='RADAR_CLIENT_SECRET', required=True,
                         help='Client secret for the RADAR service.')
-    parser.add_argument('--radar-workspace-id', dest='radar_workspace_id',
+    parser.add_argument('--radar-workspace-id', dest='RADAR_WORKSPACE_ID', required=True,
                         help='Workspace ID for the RADAR service.')
-    parser.add_argument('--radar-redirect-url', dest='radar_redirect_url',
+    parser.add_argument('--radar-redirect-url', dest='RADAR_REDIRECT_URL', required=True,
                         help='Redirect URL for the OAuth workflow of the RADAR service.')
-    parser.add_argument('--radar-email', dest='radar_email',
+    parser.add_argument('--radar-email', dest='RADAR_EMAIL', required=True,
                         help='Email for the RADAR metadata.')
-    parser.add_argument('--radar-backlink', dest='radar_backlink',
+    parser.add_argument('--radar-backlink', dest='RADAR_BACKLINK', required=True,
                         help='Backlink for the RADAR metadata.')
-    parser.add_argument('--smtp-server', dest='smtp_server',
+    parser.add_argument('--smtp-server', dest='SMTP_SERVER',
                         help='SMTP server used to inform about new release. No mail sent if empty.')
-    parser.add_argument('--notification-email', dest='notification_email',
+    parser.add_argument('--notification-email', dest='NOTIFICATION_EMAIL',
                         help='Recipient address to inform about new release. No mail sent if empty.')
-    parser.add_argument('--assets-token', dest='assets_token',
+    parser.add_argument('--assets-token', dest='ASSETS_TOKEN',
                         help='Private token, to be used when fetching assets')
-    parser.add_argument('--assets-token-name', dest='assets_token_name',
+    parser.add_argument('--assets-token-name', dest='ASSETS_TOKEN_NAME', default='PRIVATE-TOKEN',
                         help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
-    parser.add_argument('--dry', action='store_true',
+    parser.add_argument('--dry', action='store_true', dest='DRY',
                         help='Perform a dry run, do not upload anything.')
-    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+    parser.add_argument('--overwrite', dest='OVERWRITE', action='store_true', env=False,
                         help='Overwrite existing local assets.')
-    parser.add_argument('--log-level', dest='log_level',
+    parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
-    parser.add_argument('--log-file', dest='log_file',
+    parser.add_argument('--log-file', dest='LOG_FILE',
                         help='Path to the log file')
     return parser
 
 
-def main():
-    parser = create_parser()
-
-    settings.setup(parser, validate=[
-        'CODEMETA_LOCATION',
-        'RADAR_URL',
-        'RADAR_CLIENT_ID',
-        'RADAR_CLIENT_SECRET',
-        'RADAR_REDIRECT_URL',
-        'RADAR_USERNAME',
-        'RADAR_PASSWORD',
-        'RADAR_WORKSPACE_ID',
-        'RADAR_EMAIL',
-        'RADAR_BACKLINK'
-    ])
-
+def main(args):
     # setup the radar directory
-    if settings.RADAR_PATH is None:
+    if args.RADAR_PATH is None:
         radar_path, tmp_dir = setup_tmp_assets_path()
     else:
-        radar_path = setup_assets_path(settings.RADAR_PATH, exist_ok=True)
+        radar_path = setup_assets_path(args.RADAR_PATH, exist_ok=True)
 
     # collect assets
     try:
-        fetch_files(settings.ASSETS, radar_path, headers={
-            settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
-        }, overwrite=settings.OVERWRITE)
+        fetch_files(args.ASSETS, radar_path, headers={
+            args.ASSETS_TOKEN_NAME: args.ASSETS_TOKEN
+        }, overwrite=args.OVERWRITE)
     except AssetExistsError as e:
-        parser.error(f'Could not fetch {e.location}. File {e.file_path} already exists. '
-                      'Use --overwrite to overwrite assets.')
+        raise ParserError(f'Could not fetch {e.location}. File {e.file_path} already exists. '
+                           'Use --overwrite to overwrite assets.') from e
 
     # prepare radar payload
     codemeta = CodemetaMetadata()
-    codemeta.fetch(settings.CODEMETA_LOCATION)
-    codemeta.fetch_authors(settings.CREATORS_LOCATIONS)
-    codemeta.fetch_contributors(settings.CONTRIBUTORS_LOCATIONS)
+    codemeta.fetch(args.CODEMETA_LOCATION)
+    codemeta.fetch_authors(args.CREATORS_LOCATIONS)
+    codemeta.fetch_contributors(args.CONTRIBUTORS_LOCATIONS)
     codemeta.compute_names()
     codemeta.remove_doubles()
-    if settings.SORT_AUTHORS:
+    if args.SORT_AUTHORS:
         codemeta.sort_persons()
 
     codemeta.data['name'] = '{name} ({version})'.format(**codemeta.data)  # override name/title to include version
@@ -131,30 +117,30 @@ def main():
             'name': 'The authors'
         }]
 
-    radar_metadata = RadarMetadata(codemeta.data, settings.RADAR_EMAIL, settings.RADAR_BACKLINK)
+    radar_metadata = RadarMetadata(codemeta.data, args.RADAR_EMAIL, args.RADAR_BACKLINK)
     radar_dict = radar_metadata.as_dict()
 
-    if not settings.DRY:
+    if not args.DRY:
         # obtain oauth token
-        headers = fetch_radar_token(settings.RADAR_URL, settings.RADAR_CLIENT_ID, settings.RADAR_CLIENT_SECRET,
-                                    settings.RADAR_REDIRECT_URL, settings.RADAR_USERNAME, settings.RADAR_PASSWORD)
+        headers = fetch_radar_token(args.RADAR_URL, args.RADAR_CLIENT_ID, args.RADAR_CLIENT_SECRET,
+                                    args.RADAR_REDIRECT_URL, args.RADAR_USERNAME, args.RADAR_PASSWORD)
 
         # update or create radar dataset
         if radar_dict.get('id'):
-            dataset_id = update_radar_dataset(settings.RADAR_URL, radar_dict.get('id'), headers, radar_dict)
+            dataset_id = update_radar_dataset(args.RADAR_URL, radar_dict.get('id'), headers, radar_dict)
         else:
-            dataset_id = create_radar_dataset(settings.RADAR_URL, settings.RADAR_WORKSPACE_ID, headers, radar_dict)
+            dataset_id = create_radar_dataset(args.RADAR_URL, args.RADAR_WORKSPACE_ID, headers, radar_dict)
 
         # upload assets
-        upload_radar_assets(settings.RADAR_URL, dataset_id, headers, settings.ASSETS, radar_path)
+        upload_radar_assets(args.RADAR_URL, dataset_id, headers, args.ASSETS, radar_path)
     else:
         print(json.dumps(radar_dict))
 
-    if settings.SMTP_SERVER and settings.NOTIFICATION_EMAIL:
-        radar_url = f'{settings.RADAR_URL}/radar/de/workspace/{settings.RADAR_WORKSPACE_ID}.{settings.RADAR_CLIENT_ID}'
+    if args.SMTP_SERVER and args.NOTIFICATION_EMAIL:
+        radar_url = f'{args.RADAR_URL}/radar/de/workspace/{args.RADAR_WORKSPACE_ID}.{args.RADAR_CLIENT_ID}'
 
         send_mail(
-            settings.SMTP_SERVER, settings.RADAR_EMAIL, settings.NOTIFICATION_EMAIL,
+            args.SMTP_SERVER, args.RADAR_EMAIL, args.NOTIFICATION_EMAIL,
             'New RADAR release ready to publish',
             'A new RADAR release has been uploaded by a CI pipeline.\n\n'
             f'Please visit {radar_url} to publish this release.'
@@ -167,7 +153,7 @@ def main():
 
 
 def main_deprecated():
-    cli.cli_call_deprecated(main)
+    cli.cli_call_deprecated(__name__)
 
 
 if __name__ == "__main__":

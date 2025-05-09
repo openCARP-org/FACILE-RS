@@ -18,86 +18,71 @@ Usage
     :prog: prepare_radar.py
 
 """
-
-import argparse
 import json
 from pathlib import Path
 
-from .utils import cli, settings
+from .utils import cli
 from .utils.metadata import CodemetaMetadata, RadarMetadata
 from .utils.radar import create_radar_dataset, fetch_radar_token, prepare_radar_dataset
 
 
 def create_parser(add_help=True):
-    parser = argparse.ArgumentParser(add_help=add_help)
-    parser.add_argument('--codemeta-location', dest='codemeta_location',
+    parser = cli.Parser(add_help=add_help)
+
+    parser.add_argument('--codemeta-location', dest='CODEMETA_LOCATION',
                         help='Location of the main codemeta.json JSON file')
-    parser.add_argument('--radar-url', dest='radar_url',
+    parser.add_argument('--radar-url', dest='RADAR_URL', required=True,
                         help='URL of the RADAR service.')
-    parser.add_argument('--radar-username', dest='radar_username',
+    parser.add_argument('--radar-username', dest='RADAR_USERNAME', required=True,
                         help='Username for the RADAR service.')
-    parser.add_argument('--radar-password', dest='radar_password',
+    parser.add_argument('--radar-password', dest='RADAR_PASSWORD', required=True,
                         help='Password for the RADAR service.')
-    parser.add_argument('--radar-client-id', dest='radar_client_id',
+    parser.add_argument('--radar-client-id', dest='RADAR_CLIENT_ID', required=True,
                         help='Client ID for the RADAR service.')
-    parser.add_argument('--radar-client-secret', dest='radar_client_secret',
+    parser.add_argument('--radar-client-secret', dest='RADAR_CLIENT_SECRET', required=True,
                         help='Client secret for the RADAR service.')
-    parser.add_argument('--radar-workspace-id', dest='radar_workspace_id',
+    parser.add_argument('--radar-workspace-id', dest='RADAR_WORKSPACE_ID', required=True,
                         help='Workspace ID for the RADAR service.')
-    parser.add_argument('--radar-redirect-url', dest='radar_redirect_url',
+    parser.add_argument('--radar-redirect-url', dest='RADAR_REDIRECT_URL', required=True,
                         help='Redirect URL for the OAuth workflow of the RADAR service.')
-    parser.add_argument('--radar-email', dest='radar_email',
+    parser.add_argument('--radar-email', dest='RADAR_EMAIL', required=True,
                         help='Email for the RADAR metadata.')
-    parser.add_argument('--radar-backlink', dest='radar_backlink',
+    parser.add_argument('--radar-backlink', dest='RADAR_BACKLINK', required=True,
                         help='Backlink for the RADAR metadata.')
-    parser.add_argument('--dry', action='store_true',
+    parser.add_argument('--dry', action='store_true', dest='DRY',
                         help='Perform a dry run, do not upload anything.')
-    parser.add_argument('--log-level', dest='log_level',
+    parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
-    parser.add_argument('--log-file', dest='log_file',
+    parser.add_argument('--log-file', dest='LOG_FILE',
                         help='Path to the log file')
     return parser
 
 
-def main():
-    parser = create_parser()
-
-    settings.setup(parser, validate=[
-        'RADAR_URL',
-        'RADAR_CLIENT_ID',
-        'RADAR_CLIENT_SECRET',
-        'RADAR_REDIRECT_URL',
-        'RADAR_USERNAME',
-        'RADAR_PASSWORD',
-        'RADAR_WORKSPACE_ID',
-        'RADAR_EMAIL',
-        'RADAR_BACKLINK'
-    ])
-
-    if settings.CODEMETA_LOCATION:
+def main(args):
+    if args.CODEMETA_LOCATION:
         codemeta = CodemetaMetadata()
-        codemeta.fetch(settings.CODEMETA_LOCATION)
+        codemeta.fetch(args.CODEMETA_LOCATION)
 
         name = '{name} ({version}, in preparation)'.format(**codemeta.data)
     else:
         name = 'in preparation'
 
-    radar_metadata = RadarMetadata({'name': name}, settings.RADAR_EMAIL, settings.RADAR_BACKLINK)
+    radar_metadata = RadarMetadata({'name': name}, args.RADAR_EMAIL, args.RADAR_BACKLINK)
     radar_dict = radar_metadata.as_dict()
 
-    if not settings.DRY:
+    if not args.DRY:
         # obtain oauth token
-        headers = fetch_radar_token(settings.RADAR_URL, settings.RADAR_CLIENT_ID, settings.RADAR_CLIENT_SECRET,
-                                    settings.RADAR_REDIRECT_URL, settings.RADAR_USERNAME, settings.RADAR_PASSWORD)
+        headers = fetch_radar_token(args.RADAR_URL, args.RADAR_CLIENT_ID, args.RADAR_CLIENT_SECRET,
+                                    args.RADAR_REDIRECT_URL, args.RADAR_USERNAME, args.RADAR_PASSWORD)
 
         # create radar dataset
-        dataset_id = create_radar_dataset(settings.RADAR_URL, settings.RADAR_WORKSPACE_ID, headers, radar_dict)
-        dataset = prepare_radar_dataset(settings.RADAR_URL, dataset_id, headers)
+        dataset_id = create_radar_dataset(args.RADAR_URL, args.RADAR_WORKSPACE_ID, headers, radar_dict)
+        dataset = prepare_radar_dataset(args.RADAR_URL, dataset_id, headers)
 
         doi = dataset.get('descriptiveMetadata', {}).get('identifier', {}).get('value')
         doi_url = 'https://doi.org/' + doi
 
-        if settings.CODEMETA_LOCATION:
+        if args.CODEMETA_LOCATION:
             codemeta.data['@id'] = doi_url
             doi_entry = {
                 '@type': 'PropertyValue',
@@ -126,7 +111,7 @@ def main():
             else:
                 codemeta.data['identifier'] = [doi_entry, radar_entry]
 
-            Path(settings.CODEMETA_LOCATION).expanduser().write_text(codemeta.to_json())
+            Path(args.CODEMETA_LOCATION).expanduser().write_text(codemeta.to_json())
         else:
             print(dataset)
     else:
@@ -134,7 +119,7 @@ def main():
 
 
 def main_deprecated():
-    cli.cli_call_deprecated(main)
+    cli.cli_call_deprecated(__name__)
 
 
 if __name__ == "__main__":

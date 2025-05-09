@@ -19,12 +19,10 @@ Usage
     :prog: create_zenodo.py
 
 """
-
-import argparse
 import json
 
-from .utils import cli, settings, setup_assets_path, setup_tmp_assets_path
-from .utils.exceptions import AssetExistsError
+from .utils import cli, setup_assets_path, setup_tmp_assets_path
+from .utils.exceptions import AssetExistsError, ParserError
 from .utils.http import fetch_files
 from .utils.mail import send_mail
 from .utils.metadata import CodemetaMetadata, ZenodoMetadata
@@ -32,75 +30,72 @@ from .utils.zenodo import create_zenodo_dataset, update_zenodo_dataset, upload_z
 
 
 def create_parser(add_help=True):
-    parser = argparse.ArgumentParser(add_help=add_help)
-    parser.add_argument('assets', nargs='*', default=[],
+    parser = cli.Parser(add_help=add_help)
+
+    parser.add_argument('ASSETS', nargs='*', default=[],
                         help='Assets to be added to the repository.')
-    parser.add_argument('--codemeta-location', dest='codemeta_location',
+    parser.add_argument('--codemeta-location', dest='CODEMETA_LOCATION', required=True,
                         help='Location of the main codemeta.json JSON file')
-    parser.add_argument('--creators-locations', '--creators-location', dest='creators_locations', action='append', default=[],
+    parser.add_argument('--creators-locations', '--creators-location', dest='CREATORS_LOCATIONS',
+                        action='append', default=[],
                         help='Locations of codemeta JSON files for additional creators')
-    parser.add_argument('--contributors-locations', '--contributors-location', dest='contributors_locations', action='append', default=[],
+    parser.add_argument('--contributors-locations', '--contributors-location', dest='CONTRIBUTORS_LOCATIONS',
+                        action='append', default=[],
                         help='Locations of codemeta JSON files for additional contributors')
-    parser.add_argument('--no-sort-authors', dest='sort_authors', action='store_false',
+    parser.add_argument('--no-sort-authors', dest='SORT_AUTHORS', action='store_false', default=True,
                         help='Do not sort authors alphabetically, keep order in codemeta.json file')
-    parser.set_defaults(sort_authors=True)
-    parser.add_argument('--zenodo-path', dest='zenodo_path',
-                        help='Path to the local directory, where the assets are collected before upload. Optional: if not provided, a temporary directory is used.')
-    parser.add_argument('--zenodo-url', dest='zenodo_url',
+    parser.add_argument('--zenodo-path', dest='ZENODO_PATH',
+                        help='Path to the local directory, where the assets are collected before upload. '
+                             'Optional: if not provided, a temporary directory is used.')
+    parser.add_argument('--zenodo-url', dest='ZENODO_URL', required=True,
                         help='URL of the Zenodo service. Test environment available at https://sandbox.zenodo.org')
-    parser.add_argument('--zenodo-token', dest='zenodo_token',
+    parser.add_argument('--zenodo-token', dest='ZENODO_TOKEN', required=True,
                         help='Zenodo personal token.')
-    parser.add_argument('--smtp-server', dest='smtp_server',
+    parser.add_argument('--smtp-server', dest='SMTP_SERVER',
                         help='SMTP server used to inform about new release. No mail sent if empty.')
-    parser.add_argument('--notification-email', dest='notification_email',
+    parser.add_argument('--notification-email', dest='NOTIFICATION_EMAIL',
                         help='Recipient address to inform about new release. No mail sent if empty.')
-    parser.add_argument('--assets-token', dest='assets_token',
+    parser.add_argument('--assets-token', dest='ASSETS_TOKEN',
                         help='Private token, to be used when fetching assets')
-    parser.add_argument('--assets-token-name', dest='assets_token_name',
+    parser.add_argument('--assets-token-name', dest='ASSETS_TOKEN_NAME', default='PRIVATE-TOKEN',
                         help='Name of the header field for the token [default: "PRIVATE-TOKEN"]')
-    parser.add_argument('--dry', action='store_true',
+    parser.add_argument('--dry', action='store_true', dest='DRY',
                         help='Perform a dry run, do not upload anything.')
-    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+    parser.add_argument('--overwrite', dest='OVERWRITE', action='store_true', env=False,
                         help='Overwrite existing local assets.')
-    parser.add_argument('--log-level', dest='log_level',
+    parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
-    parser.add_argument('--log-file', dest='log_file',
+    parser.add_argument('--log-file', dest='LOG_FILE',
                         help='Path to the log file')
     return parser
 
 
-def main():
-    parser = create_parser()
-
-    settings.setup(parser, validate=[
-        'CODEMETA_LOCATION',
-        'ZENODO_URL',
-        'ZENODO_TOKEN'
-    ])
-
+def main(args):
     # setup the zenodo directory
-    if settings.ZENODO_PATH is None:
+    if args.ZENODO_PATH is None:
         zenodo_path, tmp_dir = setup_tmp_assets_path()
     else:
-        zenodo_path = setup_assets_path(settings.ZENODO_PATH, exist_ok=True)
+        zenodo_path = setup_assets_path(args.ZENODO_PATH, exist_ok=True)
 
     # collect assets
     try:
-        fetch_files(settings.ASSETS, zenodo_path, headers={
-            settings.ASSETS_TOKEN_NAME: settings.ASSETS_TOKEN
-        }, overwrite=settings.OVERWRITE)
+        fetch_files(args.ASSETS, zenodo_path, headers={
+            args.ASSETS_TOKEN_NAME: args.ASSETS_TOKEN
+        }, overwrite=args.OVERWRITE)
     except AssetExistsError as e:
-        parser.error(f'Could not fetch {e.location}. File {e.file_path} already exists. '
-                      'Use --overwrite to overwrite assets.')
+        raise ParserError(f'Could not fetch {e.location}. File {e.file_path} already exists. '
+                           'Use --overwrite to overwrite assets.') from e
+
+    print(args)
 
     # prepare Zenodo payload
     codemeta = CodemetaMetadata()
-    codemeta.fetch(settings.CODEMETA_LOCATION)
-    codemeta.fetch_authors(settings.CREATORS_LOCATIONS)
-    codemeta.fetch_contributors(settings.CONTRIBUTORS_LOCATIONS)
+    codemeta.fetch(args.CODEMETA_LOCATION)
+    codemeta.fetch_authors(args.CREATORS_LOCATIONS)
+    codemeta.fetch_contributors(args.CONTRIBUTORS_LOCATIONS)
     codemeta.compute_names()
     codemeta.remove_doubles()
-    if settings.SORT_AUTHORS:
+    if args.SORT_AUTHORS:
         codemeta.sort_persons()
 
     # override name/title to include version
@@ -109,7 +104,7 @@ def main():
     zenodo_metadata = ZenodoMetadata(codemeta.data)
     zenodo_dict = zenodo_metadata.as_dict()
 
-    if not settings.DRY:
+    if not args.DRY:
         # update or create Zenodo dataset
         zenodo_id = None
         if 'identifier' in codemeta.data and isinstance(codemeta.data['identifier'], list):
@@ -118,18 +113,18 @@ def main():
                     zenodo_id = identifier['value']
 
         if zenodo_id:
-            dataset_id = update_zenodo_dataset(settings.ZENODO_URL, zenodo_id, settings.ZENODO_TOKEN, zenodo_dict)
+            dataset_id = update_zenodo_dataset(args.ZENODO_URL, zenodo_id, args.ZENODO_TOKEN, zenodo_dict)
         else:
-            dataset_id = create_zenodo_dataset(settings.ZENODO_URL, settings.ZENODO_TOKEN, zenodo_dict)
+            dataset_id = create_zenodo_dataset(args.ZENODO_URL, args.ZENODO_TOKEN, zenodo_dict)
 
         # upload assets
-        upload_zenodo_assets(settings.ZENODO_URL, dataset_id, settings.ZENODO_TOKEN, settings.ASSETS, zenodo_path)
+        upload_zenodo_assets(args.ZENODO_URL, dataset_id, args.ZENODO_TOKEN, args.ASSETS, zenodo_path)
 
-        if settings.SMTP_SERVER and settings.NOTIFICATION_EMAIL:
-            zenodo_url = f'{settings.ZENODO_URL}/uploads/{dataset_id}'
+        if args.SMTP_SERVER and args.NOTIFICATION_EMAIL:
+            zenodo_url = f'{args.ZENODO_URL}/uploads/{dataset_id}'
 
             send_mail(
-                settings.SMTP_SERVER, settings.NOTIFICATION_EMAIL, settings.NOTIFICATION_EMAIL,
+                args.SMTP_SERVER, args.NOTIFICATION_EMAIL, args.NOTIFICATION_EMAIL,
                 'New Zenodo release ready to publish',
                 'A new Zenodo release has been uploaded by a CI pipeline.\n\n'
                 f'Please visit {zenodo_url} to publish this release.'
@@ -145,7 +140,7 @@ def main():
 
 
 def main_deprecated():
-    cli.cli_call_deprecated(main)
+    cli.cli_call_deprecated(__name__)
 
 
 if __name__ == "__main__":

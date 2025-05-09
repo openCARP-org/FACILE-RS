@@ -18,44 +18,37 @@ Usage
     :prog: prepare_zenodo.py
 
 """
-
-import argparse
 import json
 from pathlib import Path
 
-from .utils import cli, settings
+from .utils import cli
 from .utils.metadata import CodemetaMetadata, ZenodoMetadata
 from .utils.zenodo import create_zenodo_dataset, prepare_zenodo_dataset
 
 
 def create_parser(add_help=True):
-    parser = argparse.ArgumentParser(add_help=add_help)
-    parser.add_argument('--codemeta-location', dest='codemeta_location',
+    parser = cli.Parser(add_help=add_help)
+
+    parser.add_argument('--codemeta-location', dest='CODEMETA_LOCATION',
                         help='Location of the main codemeta.json JSON file')
-    parser.add_argument('--zenodo-url', dest='zenodo_url',
+    parser.add_argument('--zenodo-url', dest='ZENODO_URL', required=True,
                         help='URL of the Zenodo service. Test environment available at https://sandbox.zenodo.org')
-    parser.add_argument('--zenodo-token', dest='zenodo_token',
+    parser.add_argument('--zenodo-token', dest='ZENODO_TOKEN', required=True,
                         help='Zenodo personal token.')
-    parser.add_argument('--dry', action='store_true',
+    parser.add_argument('--dry', action='store_true', dest='DRY',
                         help='Perform a dry run, do not upload anything.')
-    parser.add_argument('--log-level', dest='log_level',
+    parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
-    parser.add_argument('--log-file', dest='log_file',
+    parser.add_argument('--log-file', dest='LOG_FILE',
                         help='Path to the log file')
     return parser
 
 
-def main():
-    parser = create_parser()
+def main(args):
 
-    settings.setup(parser, validate=[
-        'ZENODO_URL',
-        'ZENODO_TOKEN'
-    ])
-
-    if settings.CODEMETA_LOCATION:
+    if args.CODEMETA_LOCATION:
         codemeta = CodemetaMetadata()
-        codemeta.fetch(settings.CODEMETA_LOCATION)
+        codemeta.fetch(args.CODEMETA_LOCATION)
         name = '{name} ({version}, in preparation)'.format(**codemeta.data)
     else:
         name = 'in preparation'
@@ -63,16 +56,16 @@ def main():
     zenodo_metadata = ZenodoMetadata({'name': name})
     zenodo_dict = zenodo_metadata.as_dict()
 
-    if not settings.DRY:
+    if not args.DRY:
         # create Zenodo dataset
-        dataset_id = create_zenodo_dataset(settings.ZENODO_URL, settings.ZENODO_TOKEN, zenodo_dict)
-        dataset = prepare_zenodo_dataset(settings.ZENODO_URL, dataset_id, settings.ZENODO_TOKEN)
+        dataset_id = create_zenodo_dataset(args.ZENODO_URL, args.ZENODO_TOKEN, zenodo_dict)
+        dataset = prepare_zenodo_dataset(args.ZENODO_URL, dataset_id, args.ZENODO_TOKEN)
 
         doi = dataset.get('metadata', {}).get('doi', {})
         doi_url = 'https://doi.org/' + doi
 
         # Update Codemeta file with DOI and Zenodo ID
-        if settings.CODEMETA_LOCATION:
+        if args.CODEMETA_LOCATION:
             codemeta.data['@id'] = doi_url
             doi_entry = {
                 '@type': 'PropertyValue',
@@ -101,7 +94,7 @@ def main():
             else:
                 codemeta.data['identifier'] = [doi_entry, zenodo_entry]
 
-            Path(settings.CODEMETA_LOCATION).expanduser().write_text(codemeta.to_json())
+            Path(args.CODEMETA_LOCATION).expanduser().write_text(codemeta.to_json())
         else:
             print(dataset)
     else:
@@ -109,7 +102,7 @@ def main():
 
 
 def main_deprecated():
-    cli.cli_call_deprecated(main)
+    cli.cli_call_deprecated(__name__)
 
 
 if __name__ == "__main__":
