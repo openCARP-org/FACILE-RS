@@ -116,6 +116,6 @@ omit = [
     "test_*.py",
 ]
 exclude_lines = [
-    "cli.cli_call_deprecated(main)",
+    "cli.main_deprecated(__name__)",
     "main_deprecated()",
 ]

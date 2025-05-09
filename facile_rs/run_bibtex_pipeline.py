@@ -72,7 +72,7 @@ def main(args):
 
 
 def main_deprecated():
-    cli.cli_call_deprecated(__name__)
+    cli.main_deprecated(__name__)
 
 
 if __name__ == "__main__":

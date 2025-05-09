@@ -257,7 +257,7 @@ def main():
                 parser.error(e)
 
 
-def cli_call_deprecated(module_name):
+def main_deprecated(module_name):
     """
     Display a deprecation warning when a script is called from the command line directly,
     without using the 'facile-rs' entry point.
