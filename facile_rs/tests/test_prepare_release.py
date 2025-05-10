@@ -1,10 +1,8 @@
 import json
 import sys
 from datetime import date
-from os import path
 
 from facile_rs.utils.cli import main
-
 
 RELEASE_TAG = 'v0.1.0'
 RELEASE_DATE = '2024-12-16'
@@ -17,7 +15,7 @@ MINIMAL_CODEMETA = """{
     "license": "https://spdx.org/licenses/GPL-3.0",
     "identifier": "http://dx.doi.org/10.5281/zenodo.XXXX"
 }
-"""
+"""  # noqa: E501
 
 
 def assertions(initial_codemeta, modified_codemeta, release_tag, release_date):

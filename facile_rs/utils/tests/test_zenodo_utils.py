@@ -30,13 +30,13 @@ ZENODO_URL = 'https://sandbox.zenodo.org'
 
 # Skip the tests if no Zenodo token is provided
 @pytest.mark.skipif(
-    os.getenv("ZENODO_TOKEN_PYTEST") is None, 
+    os.getenv("ZENODO_TOKEN_PYTEST") is None,
     reason="ZENODO_TOKEN_PYTEST is not set."
 )
 def test_zenodo_utils(tmp_path):
-    
+
     record_id = None
-    
+
     try:
 
         # Test record creation
@@ -70,9 +70,8 @@ def test_zenodo_utils(tmp_path):
         assert len(record_json['files']) == 2
         for file in record_json['files']:
             assert file['key'] in (os.path.basename(asset) for asset in assets)
-    
+
     finally:
 
         if record_id is not None:
             delete_zenodo_dataset(ZENODO_URL, record_id, ZENODO_TOKEN_PYTEST)
-

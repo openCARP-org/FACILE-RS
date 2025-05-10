@@ -1,9 +1,7 @@
 import json
 import sys
-from os import path
 
 from facile_rs.utils.cli import main
-
 
 RELEASE_TAG = 'v0.1.0'
 RELEASE_DESCRIPTION = 'Release for version 0.1.0'
@@ -14,7 +12,7 @@ ASSETS = ['https://example.com/assets/asset1', 'https://example.com/assets/asset
 
 def test_create_release_dry_cli(monkeypatch, capsys):
     """"
-    Check release request content in dry mode using CLI options. 
+    Check release request content in dry mode using CLI options.
     """
     monkeypatch.setattr('sys.argv',
                         [

@@ -56,4 +56,3 @@ def test_dry_env(monkeypatch, capsys):
     codemeta_name = codemeta.get('name')
     codemeta_version = codemeta.get('version')
     assert captured['metadata'].get('title', '') == f'{codemeta_name} ({codemeta_version}, in preparation)'
-

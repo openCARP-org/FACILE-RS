@@ -1,6 +1,7 @@
-import pytest
 import sys
 from os import path
+
+import pytest
 
 from facile_rs.utils.cli import main
 

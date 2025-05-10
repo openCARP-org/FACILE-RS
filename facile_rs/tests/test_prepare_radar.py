@@ -1,5 +1,4 @@
 import json
-import pytest
 import sys
 from os import path
 
@@ -82,4 +81,3 @@ def test_dry_env(monkeypatch, capsys):
     codemeta_name = codemeta.get('name')
     codemeta_version = codemeta.get('version')
     assert captured['descriptiveMetadata'].get('title', '') == f'{codemeta_name} ({codemeta_version}, in preparation)'
-
