@@ -73,6 +73,11 @@ def create_parser(add_help=True):
                         help='Path to the refs yaml file.')
     parser.add_argument('--output-html', action='store_true', dest='OUTPUT_HTML',
                         help='Output HTML files instead of markdown')
+    parser.add_argument('--mathjax-location', dest='MATHJAX_LOCATION',
+                        default='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
+                        help='Location of the MathJax script for math rendering in HTML output. '
+                             'This option is only used if --output-html is set. '
+                             'Set to empty string to disable MathJax.')
     parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
     parser.add_argument('--log-file', dest='LOG_FILE',
@@ -100,7 +105,12 @@ def main(args):
     else:
         header = ''
     if args.OUTPUT_HTML:
-        header = "<html><head><meta charset=\"utf-8\"></head><body>" + header
+        header_prefix = "<html><head><meta charset=\"utf-8\">"
+        # Add mathjax script for math rendering
+        if args.MATHJAX_LOCATION:
+            header_prefix += f"<script id=\"MathJax-script\" async src=\"{args.MATHJAX_LOCATION}\"></script>"
+        header_prefix += "</head><body>"
+        header = header_prefix + header
 
     # read footer
     if args.PIPELINE_FOOTER:
