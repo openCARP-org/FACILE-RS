@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## Unreleased
 
 ### Added
+
+## v3.3.0
+
+### Added
 - Use temporary directory in `facile-rs radar create` and  `facile-rs zenodo create` if no `--radar-path` or `--zenodo-path` is provided.
 - Add `--overwrite` arguments to `facile-rs radar create` and  `facile-rs zenodo create` to overwrite already fetched assets.
 - Add `--overwrite` arguments to `facile-rs bag create` and `facile-rs bagpack create` to overwrite existing `--bag-path`.
