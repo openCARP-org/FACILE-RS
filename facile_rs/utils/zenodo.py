@@ -6,16 +6,24 @@ import requests
 logger = logging.getLogger(__file__)
 
 
-def create_zenodo_dataset(zenodo_url, zenodo_token, zenodo_dict):
+def create_zenodo_dataset(zenodo_url, zenodo_token, zenodo_dict, previous_version=None):
     """
     Create a dataset in Zenodo, using the personal token provided.
+    If a Zenodo ID is provided as `previous_version`, a new version of this Zenodo record will be created.
 
     :param zenodo_url: URL to the Zenodo repository
     :param zenodo_token: Zenodo personal token
+    :type zenodo_token: str
     :param zenodo_dict: Zenodo metadata dictionary, as returned by ZenodoMetadata.as_dict()
+    :type zenodo_dict: dict
+    :param previous_version: ID of the record to create a new version of, if applicable
+    :type previous_version: str or None
     :return: Zenodo dataset ID
+    :rtype: str
     """
     url = zenodo_url + '/api/records'
+    if previous_version:
+        url += f'/{previous_version}/versions'
     headers = {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + zenodo_token
