@@ -16,7 +16,7 @@ maintainers = [
     {name = "Jochen Klar", email = "mail@jochenklar.de"},
 ]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {file = "LICENSE"}
 classifiers = [
     'Development Status :: 5 - Production/Stable',
@@ -25,7 +25,6 @@ classifiers = [
     'License :: OSI Approved :: Apache Software License',
     'Operating System :: OS Independent',
     "Programming Language :: Python :: 3 :: Only",
-    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
@@ -35,8 +34,8 @@ classifiers = [
 dependencies = [
     "bagit~=1.7",
     "pypandoc~=1.6",
-    "python-dotenv~=0.10",
-    "python-frontmatter~=0.4",
+    "python-dotenv~=1.1",
+    "python-frontmatter~=1.1",
     "PyYaml~=6.0.2",
     "requests~=2.23",
     "python-resize-image~=1.1.20",
@@ -53,12 +52,18 @@ dev = [
     "ruff",
     "twine",
 ]
+test = [
+    "pytest",
+    "pytest-cov",
+    "coverage",
+    "cffconvert",
+]
 
 [project.urls]
 repository = "https://git.opencarp.org/openCARP/FACILE-RS"
 
 [project.scripts]
-facile-rs = "facile_rs.main:main"
+facile-rs = "facile_rs.utils.cli:main"
 create_bag = "facile_rs.create_bag:main_deprecated"
 create_bagpack = "facile_rs.create_bagpack:main_deprecated"
 create_cff = "facile_rs.create_cff:main_deprecated"
@@ -105,3 +110,12 @@ lint.ignore = [
 ]
 
 [tool.sphinx-pyproject]
+
+[tool.coverage.report]
+omit = [
+    "test_*.py",
+]
+exclude_lines = [
+    "cli.main_deprecated(__name__)",
+    "main_deprecated()",
+]

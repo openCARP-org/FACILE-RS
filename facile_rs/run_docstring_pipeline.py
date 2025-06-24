@@ -28,8 +28,6 @@ Usage
     :prog: run_docstring_pipeline.py
 
 """
-
-import argparse
 import ast
 import logging
 import os
@@ -43,7 +41,7 @@ import yaml
 from PIL import Image
 from resizeimage import resizeimage
 
-from .utils import cli, settings
+from .utils import cli
 from .utils.grav import collect_pages
 
 logger = logging.getLogger(__file__)
@@ -57,85 +55,87 @@ METADATA_RUN_PATTERN = r'EXAMPLE_(.*) = [\']([^\']*)[\']'
 
 
 def create_parser(add_help=True):
-    parser = argparse.ArgumentParser(add_help=add_help)
+    parser = cli.Parser(add_help=add_help)
 
-    parser.add_argument('--grav-path', dest='grav_path',
+    parser.add_argument('--grav-path', dest='GRAV_PATH', required=True,
                         help='Path to the grav repository directory.')
-    parser.add_argument('--pipeline', dest='pipeline',
+    parser.add_argument('--pipeline', dest='PIPELINE', required=True,
                         help='Name of the pipeline as specified in the GRAV metadata.')
-    parser.add_argument('--pipeline-source', dest='pipeline_source',
+    parser.add_argument('--pipeline-source', dest='PIPELINE_SOURCE', required=True,
                         help='Path to the source directory for the pipeline.')
-    parser.add_argument('--pipeline-images', dest='pipeline_images',
+    parser.add_argument('--pipeline-images', dest='PIPELINE_IMAGES',
                         help='Path to the images directory for the pipeline.')
-    parser.add_argument('--pipeline-header', dest='pipeline_header',
+    parser.add_argument('--pipeline-header', dest='PIPELINE_HEADER',
                         help='Path to the header template.')
-    parser.add_argument('--pipeline-footer', dest='pipeline_footer',
+    parser.add_argument('--pipeline-footer', dest='PIPELINE_FOOTER',
                         help='Path to the footer template.')
-    parser.add_argument('--pipeline-refs', dest='pipeline_refs',
+    parser.add_argument('--pipeline-refs', dest='PIPELINE_REFS',
                         help='Path to the refs yaml file.')
-    parser.add_argument('--output-html', action='store_true',
+    parser.add_argument('--output-html', action='store_true', dest='OUTPUT_HTML',
                         help='Output HTML files instead of markdown')
-    parser.add_argument('--log-level', dest='log_level',
+    parser.add_argument('--mathjax-location', dest='MATHJAX_LOCATION',
+                        default='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
+                        help='Location of the MathJax script for math rendering in HTML output. '
+                             'This option is only used if --output-html is set. '
+                             'Set to empty string to disable MathJax.')
+    parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
                         help='Log level (ERROR, WARN, INFO, or DEBUG)')
-    parser.add_argument('--log-file', dest='log_file',
+    parser.add_argument('--log-file', dest='LOG_FILE',
                         help='Path to the log file')
     return parser
 
 
-def main():
-    parser = create_parser()
-
-    settings.setup(parser, validate=[
-        'GRAV_PATH',
-        'PIPELINE',
-        'PIPELINE_SOURCE'
-    ])
-
+def main(args):
     # compile patterns
     ref_pattern = re.compile(REF_PATTERN)
     figure_pattern = re.compile(FIGURE_PATTERN)
 
     # get the source path
-    source_path = Path(settings.PIPELINE_SOURCE).expanduser()
+    source_path = Path(args.PIPELINE_SOURCE).expanduser()
 
     # get the images path
-    if settings.PIPELINE_IMAGES:
-        images_path = Path(settings.PIPELINE_IMAGES).expanduser()
+    if args.PIPELINE_IMAGES:
+        images_path = Path(args.PIPELINE_IMAGES).expanduser()
     else:
         images_path = None
 
     # read header
-    if settings.PIPELINE_HEADER:
-        header = Path(settings.PIPELINE_HEADER).expanduser().read_text()
+    if args.PIPELINE_HEADER:
+        header = Path(args.PIPELINE_HEADER).expanduser().read_text()
     else:
         header = ''
-    if settings.OUTPUT_HTML:
-        header = "<html><head><meta charset=\"utf-8\"></head><body>" + header
+    if args.OUTPUT_HTML:
+        header_prefix = "<html><head><meta charset=\"utf-8\">"
+        # Add mathjax script for math rendering
+        if args.MATHJAX_LOCATION:
+            header_prefix += f"<script id=\"MathJax-script\" async src=\"{args.MATHJAX_LOCATION}\"></script>"
+        header_prefix += "</head><body>"
+        header = header_prefix + header
 
     # read footer
-    if settings.PIPELINE_FOOTER:
-        footer = Path(settings.PIPELINE_FOOTER).expanduser().read_text()
+    if args.PIPELINE_FOOTER:
+        footer = Path(args.PIPELINE_FOOTER).expanduser().read_text()
     else:
         footer = ''
-    if settings.OUTPUT_HTML:
+    if args.OUTPUT_HTML:
         footer = footer + "</body></html>"
 
     # read refs
-    if settings.PIPELINE_REFS:
-        refs_path = Path(settings.PIPELINE_REFS).expanduser()
+    if args.PIPELINE_REFS:
+        refs_path = Path(args.PIPELINE_REFS).expanduser()
         refs = yaml.safe_load(refs_path.read_text())
     else:
         refs = {}
 
     # loop over all experiments
-    for page_path, page, _ in collect_pages(settings.GRAV_PATH, settings.PIPELINE):
+    for page_path, page, _ in collect_pages(args.GRAV_PATH, args.PIPELINE):
         for root, dirs, files in os.walk(source_path):
             # skip source_path itself
             if root != source_path:
                 root_path = Path(root)
                 run_path = root_path / 'run.py'
                 init_path = root_path / '__init__.py'
-                if settings.OUTPUT_HTML:
+                if args.OUTPUT_HTML:
                     md_path = Path(root.replace(str(source_path), str(page_path.parent)).lower()) / 'default.html'
                 else:
                     md_path = Path(root.replace(str(source_path), str(page_path.parent)).lower()) / 'default.md'
@@ -180,7 +180,7 @@ def main():
                         figure = m.group(1)
                         image = figure.replace('/images/', '')
                         images.append(image)
-                        if settings.OUTPUT_HTML:
+                        if args.OUTPUT_HTML:
                             docstring = docstring.replace(figure, image)
                         else:
                             docstring = docstring.replace(figure, str(Path(root_path.name.lower()) / image))
@@ -238,7 +238,7 @@ def main():
 
                     # write the grav file
                     logger.info('writing to %s', md_path)
-                    if settings.OUTPUT_HTML:
+                    if args.OUTPUT_HTML:
                         md_path.write_text(content)
                     else:
                         md_path.write_text(frontmatter.dumps(page))
@@ -278,7 +278,7 @@ def main():
 
 
 def main_deprecated():
-    cli.cli_call_deprecated(main)
+    cli.main_deprecated(__name__)
 
 
 if __name__ == "__main__":

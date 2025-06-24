@@ -1,0 +1,229 @@
+{
+    "metadata": {
+        "language": "eng",
+        "title": "FACILE-RS (v3.0.0)",
+        "additional_titles": [
+            {
+                "title": "Findability and Accessibility through Continuous Integration With Less Effort for Research Software",
+                "type": {
+                    "id": "alternative-title"
+                }
+            }
+        ],
+        "version": "v3.0.0",
+        "publication_date": "2024-11-22",
+        "related_identifiers": [
+            {
+                "relation_type": {
+                    "id": "isdocumentedby"
+                },
+                "identifier": "https://doi.org/10.17192/bfdm.2022.1.8368"
+            },
+            {
+                "relation_type": {
+                    "id": "issupplementto"
+                },
+                "identifier": "https://git.opencarp.org/openCARP/FACILE-RS"
+            }
+        ],
+        "creators": [
+            {
+                "person_or_org": {
+                    "type": "organizational",
+                    "name": "openCARP consortium"
+                }
+            },
+            {
+                "person_or_org": {
+                    "type": "personal",
+                    "family_name": "Houillon",
+                    "given_name": "Marie",
+                    "identifiers": [
+                        {
+                            "scheme": "orcid",
+                            "identifier": "0000-0002-6584-0233"
+                        }
+                    ]
+                },
+                "affiliations": [
+                    {
+                        "id": "04t3en479",
+                        "name": "Karlsruhe Institute of Technology (KIT)"
+                    }
+                ]
+            },
+            {
+                "person_or_org": {
+                    "type": "personal",
+                    "family_name": "Klar",
+                    "given_name": "Jochen",
+                    "identifiers": [
+                        {
+                            "scheme": "orcid",
+                            "identifier": "0000-0002-5883-4273"
+                        }
+                    ]
+                },
+                "affiliations": [
+                    {
+                        "name": ""
+                    }
+                ]
+            },
+            {
+                "person_or_org": {
+                    "type": "personal",
+                    "family_name": "Loewe",
+                    "given_name": "Axel",
+                    "identifiers": [
+                        {
+                            "scheme": "orcid",
+                            "identifier": "0000-0002-2487-4744"
+                        }
+                    ]
+                },
+                "affiliations": [
+                    {
+                        "id": "04t3en479",
+                        "name": "Karlsruhe Institute of Technology (KIT)"
+                    }
+                ]
+            },
+            {
+                "person_or_org": {
+                    "type": "personal",
+                    "family_name": "Stary",
+                    "given_name": "Tomas",
+                    "identifiers": [
+                        {
+                            "scheme": "orcid",
+                            "identifier": "0000-0001-9614-6263"
+                        }
+                    ]
+                },
+                "affiliations": [
+                    {
+                        "id": "04t3en479",
+                        "name": "Karlsruhe Institute of Technology (KIT)"
+                    }
+                ]
+            }
+        ],
+        "description": "A set of Python scripts for tasks around the archival and long term preservation of software repositories.",
+        "subjects": [
+            {
+                "subject": "research software"
+            },
+            {
+                "subject": "devops"
+            },
+            {
+                "subject": "continuous integration"
+            },
+            {
+                "subject": "datacite"
+            },
+            {
+                "subject": "gitlab"
+            },
+            {
+                "subject": "http://id.loc.gov/authorities/subjects/sh99001417"
+            },
+            {
+                "subject": "http://id.loc.gov/authorities/subjects/sh85124299"
+            },
+            {
+                "subject": "http://id.loc.gov/authorities/subjects/sh88006619 "
+            },
+            {
+                "subject": "http://id.loc.gov/authorities/subjects/sh85124299"
+            },
+            {
+                "subject": "ComputerScience"
+            },
+            {
+                "subject": "Development tools"
+            }
+        ],
+        "contributors": [
+            {
+                "role": {
+                    "id": "distributor"
+                },
+                "person_or_org": {
+                    "type": "organizational",
+                    "name": "Karlsruhe Institute of Technology",
+                    "identifiers": [
+                        {
+                            "scheme": "ror",
+                            "identifier": "04t3en479"
+                        }
+                    ]
+                }
+            },
+            {
+                "role": {
+                    "id": "rightsholder"
+                },
+                "person_or_org": {
+                    "type": "organizational",
+                    "name": "Karlsruhe Institute of Technology (KIT)",
+                    "identifiers": [
+                        {
+                            "scheme": "ror",
+                            "identifier": "04t3en479"
+                        }
+                    ]
+                }
+            }
+        ],
+        "resource_type": {
+            "id": "software"
+        },
+        "rights": [
+            {
+                "title": {
+                    "en": "Apache-2.0"
+                },
+                "link": "https://git.opencarp.org/openCARP/FACILE-RS/-/blob/master/LICENSE"
+            }
+        ],
+        "funding": [
+            {
+                "funder": {
+                    "id": "018mejw64"
+                },
+                "award": {
+                    "title": {
+                        "en": "Sustainable Lifecycle Management for Scientific Software (SuLMaSS) - Software Dissemination and Infrastructure Development Driven by a Cardiac Electrophysiology Simulator"
+                    },
+                    "number": 391128822,
+                    "identifiers": [
+                        {
+                            "scheme": "url",
+                            "identifier": "https://gepris.dfg.de/gepris/projekt/391128822"
+                        }
+                    ]
+                }
+            },
+            {
+                "award": {
+                    "id": "00k4n6c32::955495"
+                },
+                "funder": {
+                    "id": "00k4n6c32"
+                }
+            },
+            {
+                "funder": {
+                    "id": "04t3en479"
+                },
+                "award": {
+                    "title": {
+                        "en": "FAIR Research Software"
+                    }
+                }
+            }
+        ]
+    }
+}

@@ -32,6 +32,7 @@ variables:
   ENABLE_BAGPACK: "true"
   BAG_PATH: ${PROJECT_NAME}-${CI_COMMIT_TAG}
   BAGPACK_REGISTRY_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PROJECT_NAME}-bagpack/${CI_COMMIT_TAG}
+  DATACITE_LOCATION: ${DATACITE_PATH}
 
   # RADAR
   # Set ENABLE_RADAR to "false" to deactivate release on RADAR

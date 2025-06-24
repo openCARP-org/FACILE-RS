@@ -3,6 +3,31 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+
+## v3.3.0
+
+### Added
+- Use temporary directory in `facile-rs radar create` and  `facile-rs zenodo create` if no `--radar-path` or `--zenodo-path` is provided.
+- Add `--overwrite` arguments to `facile-rs radar create` and  `facile-rs zenodo create` to overwrite already fetched assets.
+- Add `--overwrite` arguments to `facile-rs bag create` and `facile-rs bagpack create` to overwrite existing `--bag-path`.
+- Rename `--datacite-path` to `--datacite-location` in `facile-rs bagpack create` and allow for remote locations.
+- The "publisher" field in Zenodo metadata is now populated with the "publisher" name provided in the Codemeta file.
+- Include MathJax to HTML outputs in `run_docstring_pipeline`, and add option `--mathjax-location` to customize MathJax location or disable it.
+- `facile-rs zenodo prepare` now allows to create a new version of a Zenodo record, if a Zenodo ID is present in the CodeMeta file. This behavior can set using the option `--zenodo-version-update`.
+
+### Changed
+- The option `--overwrite` is not read from environment anymore: it shall be passed from the command line.
+- When HTML output is selected in run_docstring_pipeline, add Mathjax script for rendering math.
+
+### Fixed
+- Fix remove-doubles when name is given as givenName and familyName.
+
+### Removed
+- Drop support for Python 3.8
+
 ## v3.2.1
 
 ### Changed

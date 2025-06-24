@@ -64,13 +64,14 @@ class CodemetaMetadata:
                         thing['name'] = '{} {}'.format(thing['givenName'], thing['familyName'])
 
     def remove_doubles(self):
-        """Remove duplicates in authors and contributors lists, comparing names (key: name)
-        and ids (key: @id).
+        """Remove duplicates in authors and contributors lists, comparing names (key: name), concatenation of keys
+        givenName and familyName, and ids (key: @id).
         """
         for key in ['author', 'contributor']:
             if key in self.data:
                 ids = set()
                 names = set()
+                givenAndFamilyNames = set()
                 things = []
                 if not isinstance(self.data[key], list):
                     data_list = [self.data[key]]
@@ -79,7 +80,10 @@ class CodemetaMetadata:
                 for thing in data_list:
                     thing_id = thing.get('@id')
                     thing_name = thing.get('name')
-                    if thing_id in ids or thing_name in names:
+                    thing_givenAndFamilyName = None
+                    if 'givenName' in thing and 'familyName' in thing:
+                        thing_givenAndFamilyName = '{} {}'.format(thing['givenName'], thing['familyName'])
+                    if thing_id in ids or thing_name in names or thing_givenAndFamilyName in givenAndFamilyNames:
                         pass
                     else:
                         things.append(thing)
@@ -87,6 +91,8 @@ class CodemetaMetadata:
                             ids.add(thing_id)
                         if thing_name is not None:
                             names.add(thing_name)
+                        if thing_givenAndFamilyName is not None:
+                            givenAndFamilyNames.add(thing_givenAndFamilyName)
                 self.data[key] = things
 
     def sort_persons(self):

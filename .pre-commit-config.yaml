@@ -18,7 +18,7 @@ repos:
         exclude: __init__.py
         args: [--fix, --exit-non-zero-on-fix]
   - repo: https://git.opencarp.org/openCARP/FACILE-RS
-    rev: v1.5
+    rev: v3.2.2
     hooks:
     - id: create_cff
   - repo: https://github.com/crate-ci/typos
