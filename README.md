@@ -14,6 +14,7 @@ The scripts were created for the [openCARP](https://opencarp.org) simulation sof
 
 An example of integration in a CI environment is provided in the [tutorials](https://facile-rs.readthedocs.io/en/latest/tutorials/). An example of a more complex setup are the [openCARP CI file](https://git.opencarp.org/openCARP/openCARP/-/blob/master/.gitlab-ci.yml) and the [included subscripts](https://git.opencarp.org/openCARP/openCARP/-/tree/master/.gitlab/ci).
 
+FACILE-RS source code repository: https://git.opencarp.org/opencarp/FACILE-RS
 
 ## Setup
 
