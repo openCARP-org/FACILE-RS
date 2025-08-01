@@ -81,6 +81,18 @@ Environments variables can be set in the usual way, e.g. the `.gitlab-ci.yml` fi
 
 FACILE-RS comprises the following tools:
 
+### `facile-rs bag create`
+
+Creates a bag [BagIt](https://tools.ietf.org/html/rfc8493) using the [bagit-python](https://github.com/LibraryOfCongress/bagit-python) package. The assets to be included in the bag are given as positional arguments.
+
+Deprecated alias: `create_bag`
+
+### `facile-rs bagpack create`
+
+Creates a bag [BagIt](https://tools.ietf.org/html/rfc8493) similar to `create_bag.py`, but also includes a DataCite XML file as recommended by the [RDA Research Data Repository Interoperability WG](https://www.rd-alliance.org/system/files/Research%20Data%20Repository%20Interoperability%20WG%20-%20Final%20Recommendations_reviewed_0.pdf).
+
+Deprecated alias: `create_bagpack`
+
 ### `facile-rs cff create`
 
 Creates a [Citation File Format](https://citation-file-format.github.io) (CFF) file from a CodeMeta file.
@@ -96,54 +108,12 @@ For an example, see [here](https://git.opencarp.org/openCARP/openCARP/blob/maste
 
 Deprecated alias: `create_datacite`
 
-### `facile-rs bag create`
-
-Creates a bag [BagIt](https://tools.ietf.org/html/rfc8493) using the [bagit-python](https://github.com/LibraryOfCongress/bagit-python) package. The assets to be included in the bag are given as positional arguments.
-
-Deprecated alias: `create_bag`
-
-### `facile-rs bagpack create`
-
-Creates a bag [BagIt](https://tools.ietf.org/html/rfc8493) similar to `create_bag.py`, but also includes a DataCite XML file as recommended by the [RDA Research Data Repository Interoperability WG](https://www.rd-alliance.org/system/files/Research%20Data%20Repository%20Interoperability%20WG%20-%20Final%20Recommendations_reviewed_0.pdf).
-
-Deprecated alias: `create_bagpack`
-
-### `facile-rs release prepare`
-
-Updates the CodeMeta file for the given `VERSION` and `DATE` (as `dateModified`, current date if omitted). Useful to automatically get the version from a git tag and inject it into the repo's metadata file.
-
-Deprecated alias: `prepare_release`
-
 ### `facile-rs gitlab publish`
 
 Creates a release in GitLab using the GitLab API. A tag for the release needs to be created before and provided to the script.
 An example output can be found [here](https://git.opencarp.org/openCARP/openCARP/-/releases).
 
 Deprecated alias: `create_release`
-
-### `facile-rs radar prepare`
-
-Creates an empty archive in the [RADAR service](https://www.radar-service.eu) in order to "reserve" a DOI and an ID in RADAR. Both are stored in the CodeMeta file and can be used by the `create_radar` command below to include the DOI for this release in the deposited CodeMeta file. A detailed HowTo for releasing datasets on RADAR is provided in the tutorial [`03_release_radar.md`](./docs/tutorials/03_release_radar.md).
-
-Deprecated alias: `prepare_radar`
-
-### `facile-rs radar upload`
-
-Creates an archive in the [RADAR service](https://www.radar-service.eu) and uploads the assets provided as positional arguments. The metadata is created similar to `create_datacite`. If the RADAR ID is already in the CodeMeta file, the existing archive is updated instead. A detailed HowTo for releasing datasets on RADAR is provided in the tutorial [`03_release_radar.md`](./docs/tutorials/03_release_radar.md).
-
-Deprecated alias: `create_radar`
-
-### `facile-rs zenodo prepare`
-
-Creates an empty archive on [Zenodo](https://zenodo.org) in order to "reserve" a DOI and an ID in Zenodo. Both are stored in the CodeMeta file and can be used by the `create_zenodo` command below to include the DOI for this release in the deposited CodeMeta file. A detailed HowTo for releasing datasets on Zenodo is provided in the tutorial [`04_release_zenodo.md`](./docs/tutorials/04_release_zenodo.md).
-
-Deprecated alias: `prepare_zenodo`
-
-### `facile-rs zenodo upload`
-
-Creates an archive on [Zenodo](https://zenodo.org) and uploads the assets provided as positional arguments. The metadata is created similar to `create_datacite`. If the Zenodo ID is already in the CodeMeta file, the existing archive is updated instead. A detailed HowTo for releasing datasets on Zenodo is provided in the tutorial [`04_release_zenodo.md`](./docs/tutorials/04_release_zenodo.md).
-
-Deprecated alias: `create_zenodo`
 
 ### `facile-rs grav bibtex`
 
@@ -174,3 +144,33 @@ After running the script, the changes to the Grav CMS repository can be committe
 See [openCARP citation info](https://opencarp.org/download/citation) or [code of conduct](https://opencarp.org/community/code-of-conduct) for examples.
 
 Deprecated alias: `run_markdown_pipeline`
+
+### `facile-rs radar prepare`
+
+Creates an empty archive in the [RADAR service](https://www.radar-service.eu) in order to "reserve" a DOI and an ID in RADAR. Both are stored in the CodeMeta file and can be used by the `create_radar` command below to include the DOI for this release in the deposited CodeMeta file. A detailed HowTo for releasing datasets on RADAR is provided in the tutorial [`03_release_radar.md`](./docs/tutorials/03_release_radar.md).
+
+Deprecated alias: `prepare_radar`
+
+### `facile-rs radar upload`
+
+Creates an archive in the [RADAR service](https://www.radar-service.eu) and uploads the assets provided as positional arguments. The metadata is created similar to `create_datacite`. If the RADAR ID is already in the CodeMeta file, the existing archive is updated instead. A detailed HowTo for releasing datasets on RADAR is provided in the tutorial [`03_release_radar.md`](./docs/tutorials/03_release_radar.md).
+
+Deprecated alias: `create_radar`
+
+### `facile-rs release prepare`
+
+Updates the CodeMeta file for the given `VERSION` and `DATE` (as `dateModified`, current date if omitted). Useful to automatically get the version from a git tag and inject it into the repo's metadata file.
+
+Deprecated alias: `prepare_release`
+
+### `facile-rs zenodo prepare`
+
+Creates an empty archive on [Zenodo](https://zenodo.org) in order to "reserve" a DOI and an ID in Zenodo. Both are stored in the CodeMeta file and can be used by the `create_zenodo` command below to include the DOI for this release in the deposited CodeMeta file. A detailed HowTo for releasing datasets on Zenodo is provided in the tutorial [`04_release_zenodo.md`](./docs/tutorials/04_release_zenodo.md).
+
+Deprecated alias: `prepare_zenodo`
+
+### `facile-rs zenodo upload`
+
+Creates an archive on [Zenodo](https://zenodo.org) and uploads the assets provided as positional arguments. The metadata is created similar to `create_datacite`. If the Zenodo ID is already in the CodeMeta file, the existing archive is updated instead. A detailed HowTo for releasing datasets on Zenodo is provided in the tutorial [`04_release_zenodo.md`](./docs/tutorials/04_release_zenodo.md).
+
+Deprecated alias: `create_zenodo`
