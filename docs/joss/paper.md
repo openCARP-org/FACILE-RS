@@ -99,7 +99,7 @@ FACILE-RS scripts can be run using the `facile-rs` command line tool. The availa
 \begin{table}[!ht]
 \vspace{5mm}
 \centering
-\caption{\small Components of FACILE-RS}.\label{tab:cluster}
+\caption{\small Components of FACILE-RS.\label{tab:cluster}}
 \begin{tabular}{ll}
 \hline
 Script & Functionality \\
