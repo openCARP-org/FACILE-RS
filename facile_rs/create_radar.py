@@ -19,7 +19,7 @@ Usage
     :prog: create_radar.py
 
 """
-import json
+from rich import print
 
 from .utils import cli, setup_assets_path, setup_tmp_assets_path
 from .utils.exceptions import AssetExistsError, ParserError
@@ -134,7 +134,7 @@ def main(args):
         # upload assets
         upload_radar_assets(args.RADAR_URL, dataset_id, headers, args.ASSETS, radar_path)
     else:
-        print(json.dumps(radar_dict))
+        print(radar_dict)
 
     if args.SMTP_SERVER and args.NOTIFICATION_EMAIL:
         radar_url = f'{args.RADAR_URL}/radar/de/workspace/{args.RADAR_WORKSPACE_ID}.{args.RADAR_CLIENT_ID}'

@@ -17,10 +17,10 @@ Usage
    :prog: create_release.py
 
 """
-import json
 import logging
 
 import requests
+from rich import print
 
 from .utils import cli
 
@@ -76,7 +76,7 @@ def main(args):
         }
 
     if args.DRY:
-        print(json.dumps(release_json))
+        print(release_json)
     else:
         logging.debug('release_json = %s', release_json)
         response = requests.post(args.RELEASE_API_URL, headers={

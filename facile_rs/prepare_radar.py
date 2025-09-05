@@ -18,8 +18,9 @@ Usage
     :prog: prepare_radar.py
 
 """
-import json
 from pathlib import Path
+
+from rich import print
 
 from .utils import cli
 from .utils.metadata import CodemetaMetadata, RadarMetadata
@@ -115,7 +116,7 @@ def main(args):
         else:
             print(dataset)
     else:
-        print(json.dumps(radar_dict))
+        print(radar_dict)
 
 
 def main_deprecated():

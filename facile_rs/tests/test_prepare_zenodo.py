@@ -1,3 +1,4 @@
+import ast
 import json
 import sys
 from os import path
@@ -27,7 +28,7 @@ def test_dry_nocodemeta_cli(monkeypatch, capsys):
                             '--dry'
                         ])
     main()
-    captured = json.loads(capsys.readouterr().out)
+    captured = ast.literal_eval(capsys.readouterr().out)
     assert 'metadata' in captured
     assert captured['metadata'].get('title', '') == 'in preparation'
 
@@ -48,7 +49,7 @@ def test_dry_env(monkeypatch, capsys):
                             '--dry'
                         ])
     main()
-    captured = json.loads(capsys.readouterr().out)
+    captured = ast.literal_eval(capsys.readouterr().out)
     assert 'metadata' in captured
     # Test if the title is correctly set to the name and version of the codemeta file
     with open(CODEMETA_LOCATION) as f:

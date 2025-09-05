@@ -36,7 +36,7 @@ def create_zenodo_dataset(zenodo_url, zenodo_token, zenodo_dict, previous_versio
         logger.debug('response = %s', response.json())
         return response.json()['id']
     except requests.exceptions.HTTPError as e:
-        print(response.text)
+        logger.error(response.text)
         raise e
 
 
@@ -64,7 +64,7 @@ def prepare_zenodo_dataset(zenodo_url, dataset_id, zenodo_token):
         logger.debug('response = %s', response.json())
         return response.json()
     except requests.exceptions.HTTPError as e:
-        print(response.text)
+        logger.error(response.text)
         raise e
 
 
@@ -89,7 +89,7 @@ def update_zenodo_dataset(zenodo_url, dataset_id, zenodo_token, zenodo_dict):
         logger.debug('response = %s', response.json())
         return response.json()['id']
     except requests.exceptions.HTTPError as e:
-        print(response.text)
+        logger.error(response.text)
         raise e
 
 
@@ -121,7 +121,7 @@ def upload_zenodo_assets(zenodo_url, dataset_id, zenodo_token, assets, path):
             response.raise_for_status()
             logger.debug('response = %s', response.json())
         except requests.exceptions.HTTPError as e:
-            print(response.text)
+            logger.error(response.text)
             raise e
 
         # Upload file content
@@ -133,7 +133,7 @@ def upload_zenodo_assets(zenodo_url, dataset_id, zenodo_token, assets, path):
                 response.raise_for_status()
                 logger.debug('response = %s', response.json())
             except requests.exceptions.HTTPError as e:
-                print(response.json())
+                logger.error(response.json())
                 raise e
 
         # Complete file upload
@@ -143,7 +143,7 @@ def upload_zenodo_assets(zenodo_url, dataset_id, zenodo_token, assets, path):
             response.raise_for_status()
             logger.debug('response = %s', response.json())
         except requests.exceptions.HTTPError as e:
-            print(response.text)
+            logger.error(response.text)
             raise e
 
 
@@ -163,7 +163,7 @@ def delete_zenodo_dataset(zenodo_url, dataset_id, zenodo_token):
         response = requests.delete(url, headers=headers)
         response.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        print(response.text)
+        logger.error(response.text)
         raise e
 
 
@@ -184,5 +184,5 @@ def get_zenodo_dataset(zenodo_url, dataset_id, zenodo_token):
         response.raise_for_status()
         return response.json()
     except requests.exceptions.HTTPError as e:
-        print(response.text)
+        logger.error(response.text)
         raise e

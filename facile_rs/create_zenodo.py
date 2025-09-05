@@ -19,7 +19,8 @@ Usage
     :prog: create_zenodo.py
 
 """
-import json
+
+from rich import print
 
 from .utils import cli, setup_assets_path, setup_tmp_assets_path
 from .utils.exceptions import AssetExistsError, ParserError
@@ -134,7 +135,7 @@ def main(args):
         pass
 
     else:
-        print(json.dumps(zenodo_dict))
+        print(zenodo_dict)
 
 
 def main_deprecated():

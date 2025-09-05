@@ -32,6 +32,7 @@ from pathlib import Path
 from warnings import warn
 
 from dotenv import load_dotenv
+from rich.logging import RichHandler
 
 from facile_rs import (
     create_bag,
@@ -224,9 +225,12 @@ def setup_env():
 
 def setup_logs(log_level, log_file):
     log_level = log_level.upper()
-    log_file = Path(log_file).expanduser().as_posix() if log_file is not None else None
-    logging.basicConfig(level=log_level, filename=log_file, format='[%(asctime)s] %(levelname)s %(name)s: %(message)s')
-
+    if log_file is None:
+        logging.basicConfig(level=log_level, format='[%(asctime)s] %(levelname)s %(name)s: %(message)s',
+                            handlers=[RichHandler()])
+    else:
+        logging.basicConfig(level=log_level, format='[%(asctime)s] %(levelname)s %(name)s: %(message)s',
+                            filename=Path(log_file).expanduser().as_posix())
 
 def main():
     # load the environment

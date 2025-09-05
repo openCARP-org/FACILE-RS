@@ -42,6 +42,7 @@ dependencies = [
     "Pillow~=9.4.0; python_version <= '3.11'",
     "Pillow~=11.0; python_version > '3.11'",
     "setuptools",
+    "rich~=14.0"
 ]
 dynamic = ["version"]
 

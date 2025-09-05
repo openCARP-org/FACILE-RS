@@ -1,3 +1,4 @@
+import ast
 import json
 import sys
 from os import path
@@ -42,7 +43,7 @@ def test_dry_nocodemeta_cli(monkeypatch, capsys):
                             '--dry'
                         ])
     main()
-    captured = json.loads(capsys.readouterr().out)
+    captured = ast.literal_eval(capsys.readouterr().out)
     assert 'technicalMetadata' in captured
     assert 'descriptiveMetadata' in captured
     assert captured['descriptiveMetadata'].get('title', '') == 'in preparation'
@@ -71,7 +72,7 @@ def test_dry_env(monkeypatch, capsys):
                             '--dry'
                         ])
     main()
-    captured = json.loads(capsys.readouterr().out)
+    captured = ast.literal_eval(capsys.readouterr().out)
     assert 'technicalMetadata' in captured
     assert 'descriptiveMetadata' in captured
 

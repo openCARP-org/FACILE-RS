@@ -30,7 +30,7 @@ def fetch_radar_token(radar_url, client_id, client_secret, redirect_url, usernam
         response.raise_for_status()
         logger.debug('response = %s', response.json())
     except requests.exceptions.HTTPError as e:
-        print(response.text)
+        logger.error(response.text)
         raise e
 
     tokens = response.json()
@@ -56,7 +56,7 @@ def create_radar_dataset(radar_url, workspace_id, headers, radar_dict):
         logger.debug('response = %s', response.json())
         return response.json()['id']
     except requests.exceptions.HTTPError as e:
-        print(response.text)
+        logger.error(response.text)
         raise e
 
 
@@ -83,7 +83,7 @@ def prepare_radar_dataset(radar_url, dataset_id, headers):
             logger.debug('response = %s', response.json())
             raise RuntimeError('startreview did not return 422')
     except requests.exceptions.HTTPError as e:
-        print(response.text)
+        logger.error(response.text)
         raise e
 
 
@@ -104,7 +104,7 @@ def update_radar_dataset(radar_url, dataset_id, headers, radar_dict):
         logger.debug('response = %s', response.json())
         return response.json()['id']
     except requests.exceptions.HTTPError as e:
-        print(response.text)
+        logger.error(response.text)
         raise e
 
 
@@ -130,5 +130,5 @@ def upload_radar_assets(radar_url, dataset_id, headers, assets, path):
             response.raise_for_status()
             logger.debug('response = %s', response.text)
         except requests.exceptions.HTTPError as e:
-            print(response.text)
+            logger.error(response.text)
             raise e
