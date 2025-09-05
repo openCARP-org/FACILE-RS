@@ -54,6 +54,9 @@ def test_stdout(monkeypatch, capsys):
     """
     Test the CFF output to stdout
     """
+    # Increase the width of the terminal, needed since rich wraps prints
+    monkeypatch.setenv('COLUMNS', '512')
+
     # Ensure no CFF_PATH environment variable is set
     monkeypatch.delenv('CFF_PATH', raising=False)
     monkeypatch.setattr('sys.argv',

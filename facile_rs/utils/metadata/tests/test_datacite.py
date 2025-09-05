@@ -56,8 +56,8 @@ def test_render_funding_references_schemaorg(create_metadata_schemaorg):
         expected_result = f.read()
     metadata.render_funding_references()
     dom = parseString(metadata.stream.getvalue())
-    print(dom.toprettyxml())
-    assert dom.toprettyxml() == expected_result
+    print(dom.toprettyxml(indent='    '))
+    assert dom.toprettyxml(indent='    ') == expected_result
 
 
 def test_init(create_metadata):

@@ -32,6 +32,8 @@ Example usage
 """
 from pathlib import Path
 
+from rich import print
+
 from .utils import cli
 from .utils.metadata import CffMetadata, CodemetaMetadata
 

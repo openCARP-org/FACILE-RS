@@ -55,6 +55,9 @@ def test_stdout(monkeypatch, capsys):
     """
     Test the Datacite XML output to stdout
     """
+    # Increase the width of the terminal, needed since rich wraps prints
+    monkeypatch.setenv('COLUMNS', '512')
+
     # Ensure no DATACITE_PATH environment variable is set
     monkeypatch.delenv('DATACITE_PATH', raising=False)
     monkeypatch.setattr('sys.argv',

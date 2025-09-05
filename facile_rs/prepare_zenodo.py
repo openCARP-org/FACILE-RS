@@ -21,8 +21,9 @@ Usage
     :prog: prepare_zenodo.py
 
 """
-import json
 from pathlib import Path
+
+from rich import print
 
 from .utils import cli
 from .utils.metadata import CodemetaMetadata, ZenodoMetadata
@@ -121,7 +122,7 @@ def main(args):
         else:
             print(dataset)
     else:
-        print(json.dumps(zenodo_dict))
+        print(zenodo_dict)
 
 
 def main_deprecated():

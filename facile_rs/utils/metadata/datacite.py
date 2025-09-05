@@ -43,7 +43,7 @@ class DataciteMetadata:
         self.render_document()
 
         dom = parseString(self.stream.getvalue())
-        xml = dom.toprettyxml()
+        xml = dom.toprettyxml(indent='    ')
         logger.debug('xml = %s', xml)
         return xml
 

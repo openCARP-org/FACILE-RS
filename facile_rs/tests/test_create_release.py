@@ -1,4 +1,4 @@
-import json
+import ast
 import sys
 
 from facile_rs.utils.cli import main
@@ -27,13 +27,13 @@ def test_create_release_dry_cli(monkeypatch, capsys):
                             *ASSETS
                         ])
     main()
-    release_json = json.loads(capsys.readouterr().out, )
-    assert release_json['name'] == RELEASE_TAG
-    assert release_json['tag_name'] == RELEASE_TAG
-    assert release_json['description'] == RELEASE_DESCRIPTION.strip()
-    assert len(release_json['assets']['links']) == 2
-    assert release_json['assets']['links'][0]['url'] == 'https://example.com/assets/asset1'
-    assert release_json['assets']['links'][1]['name'] == 'asset2'
+    captured = ast.literal_eval(capsys.readouterr().out)
+    assert captured['name'] == RELEASE_TAG
+    assert captured['tag_name'] == RELEASE_TAG
+    assert captured['description'] == RELEASE_DESCRIPTION.strip()
+    assert len(captured['assets']['links']) == 2
+    assert captured['assets']['links'][0]['url'] == 'https://example.com/assets/asset1'
+    assert captured['assets']['links'][1]['name'] == 'asset2'
 
 
 def test_create_release_dry_env(monkeypatch, capsys):
@@ -53,10 +53,10 @@ def test_create_release_dry_env(monkeypatch, capsys):
                            '--dry'
                        ])
     main()
-    release_json = json.loads(capsys.readouterr().out)
-    assert release_json['name'] == RELEASE_TAG
-    assert release_json['tag_name'] == RELEASE_TAG
-    assert release_json['description'] == RELEASE_DESCRIPTION.strip()
-    assert len(release_json['assets']['links']) == 2
-    assert release_json['assets']['links'][1]['url'] == 'https://example.com/assets/asset2'
-    assert release_json['assets']['links'][0]['name'] == 'asset1'
+    captured = ast.literal_eval(capsys.readouterr().out)
+    assert captured['name'] == RELEASE_TAG
+    assert captured['tag_name'] == RELEASE_TAG
+    assert captured['description'] == RELEASE_DESCRIPTION.strip()
+    assert len(captured['assets']['links']) == 2
+    assert captured['assets']['links'][1]['url'] == 'https://example.com/assets/asset2'
+    assert captured['assets']['links'][0]['name'] == 'asset1'

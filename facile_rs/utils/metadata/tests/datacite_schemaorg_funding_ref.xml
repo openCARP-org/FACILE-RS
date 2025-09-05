@@ -1,15 +1,15 @@
 <?xml version="1.0" ?>
 <fundingReferences>
-	<fundingReference>
-		<funderName>Deutsche Forschungsgemeinschaft</funderName>
-		<funderIdentifier funderIdentifierType="ROR" schemeURI="https://ror.org">https://ror.org/018mejw64</funderIdentifier>
-		<awardNumber awardURI="https://gepris.dfg.de/gepris/projekt/507828355?language=en">507828355</awardNumber>
-		<awardTitle>Rolling out the openCARP simulator as a sustainable e-research infrastructure: CARPe-diem</awardTitle>
-	</fundingReference>
-	<fundingReference>
-		<funderName>European High-Performance Computing Joint Undertaking EuroHPC (JU)</funderName>
-		<funderIdentifier funderIdentifierType="ROR" schemeURI="https://ror.org">https://ror.org/00k4n6c32</funderIdentifier>
-		<awardNumber awardURI="https://eurohpc-ju.europa.eu/actions#ecl-inpage-259">955495</awardNumber>
-		<awardTitle>Numerical modeling of cardiac electrophysiology at the cellular scale</awardTitle>
-	</fundingReference>
+    <fundingReference>
+        <funderName>Deutsche Forschungsgemeinschaft</funderName>
+        <funderIdentifier funderIdentifierType="ROR" schemeURI="https://ror.org">https://ror.org/018mejw64</funderIdentifier>
+        <awardNumber awardURI="https://gepris.dfg.de/gepris/projekt/507828355?language=en">507828355</awardNumber>
+        <awardTitle>Rolling out the openCARP simulator as a sustainable e-research infrastructure: CARPe-diem</awardTitle>
+    </fundingReference>
+    <fundingReference>
+        <funderName>European High-Performance Computing Joint Undertaking EuroHPC (JU)</funderName>
+        <funderIdentifier funderIdentifierType="ROR" schemeURI="https://ror.org">https://ror.org/00k4n6c32</funderIdentifier>
+        <awardNumber awardURI="https://eurohpc-ju.europa.eu/actions#ecl-inpage-259">955495</awardNumber>
+        <awardTitle>Numerical modeling of cardiac electrophysiology at the cellular scale</awardTitle>
+    </fundingReference>
 </fundingReferences>

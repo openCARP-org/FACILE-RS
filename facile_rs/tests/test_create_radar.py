@@ -1,3 +1,4 @@
+import ast
 import json
 import sys
 from os import path
@@ -81,7 +82,7 @@ def test_dry_cli(monkeypatch, tmp_path, capsys):
                             '--dry'
                         ])
     main()
-    captured = json.loads(capsys.readouterr().out)
+    captured = ast.literal_eval(capsys.readouterr().out)
     assert 'technicalMetadata' in captured
     assert 'descriptiveMetadata' in captured
     # Test if the title is correctly set to the name and version of the codemeta file
