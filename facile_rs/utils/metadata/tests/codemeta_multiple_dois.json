@@ -1,0 +1,38 @@
+{
+    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+    "@type": "SoftwareSourceCode",
+    "name": "Test software",
+    "version": "0.1.0",
+    "author": [
+        {
+            "@id": "http://orcid.org/9998-9998-9998-9998",
+            "@type": "Person",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Karlsruhe Institute of Technology"
+            },
+            "email": "one.author@kit.edu",
+            "familyName": "Author",
+            "givenName": "One"
+        }
+    ],
+    "@id": "https://doi.org/10.5281/zenodo.1234567",
+    "identifier": [
+        {
+            "@type": "PropertyValue",
+            "propertyID": "DOI",
+            "value": "10.5281/zenodo.1234567",
+            "description": "The DOI for version 0.1.0 of this work."
+        },
+        {
+            "@type": "PropertyValue",
+            "propertyID": "Zenodo",
+            "value": "zenodoid"
+        },
+        {
+            "@type": "PropertyValue",
+            "propertyID": "DOI",
+            "value": "10.5281/1234"
+        }
+    ]
+}

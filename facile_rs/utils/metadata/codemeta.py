@@ -114,6 +114,80 @@ class CodemetaMetadata:
         if 'contributor' in self.data:
             self.data['contributor'] = sorted(self.data['contributor'], key=get_key)
 
+    def update_identifier(self, new_doi, new_archive_id='', archive_type=None, keep_previous_doi=False):
+        """Update the id field and identifier list with a new DOI and archive ID (optional).
+
+        If keep_previous_doi is True, the previous DOI is kept in the Codemeta metadata in the field "isBasedOn".
+
+        :param new_doi: new DOI to add (e.g., '10.5281/zenodo.1234567')
+        :type new_doi: str
+        :param new_archive_id: new archive ID to add (e.g., RADAR ID or Zenodo ID)
+        :type new_archive_id: str
+        :param archive_type: type of the archive, e.g., 'RADAR' or 'Zenodo'. If None, no archive ID is added.
+        :type archive_type: str or None
+        :param keep_previous_doi: whether to keep previous DOI in the Codemeta metadata
+        :type keep_previous_doi: bool
+        """
+
+        if archive_type not in [None, 'RADAR', 'Zenodo']:
+            raise ValueError("archive_type must be either None, 'RADAR', or 'Zenodo'")
+
+        previous_id = self.data.get('@id', '')
+        self.data['@id'] = 'https://doi.org/' + new_doi
+
+        doi_entry = {
+            '@type': 'PropertyValue',
+            'propertyID': 'DOI',
+            'value': new_doi,
+            'description': 'The DOI for version {version} of this work'.format(**self.data)
+        }
+        archive_entry = None
+        if archive_type and new_archive_id:
+            archive_entry = {
+                '@type': 'PropertyValue',
+                'propertyID': archive_type,
+                'value': new_archive_id
+            }
+
+        if 'identifier' in self.data:
+            # Ensure that identifier field is a list
+            if not isinstance(self.data['identifier'], list):
+                self.data['identifier'] = [self.data['identifier']]
+            previous_doi = previous_id.replace('https://doi.org/', '')
+            found_doi = False
+            found_archive = False
+            if keep_previous_doi:
+                # Get or create the isBasedOn field
+                isBasedOn = self.data.get('isBasedOn', [])
+                if not isinstance(isBasedOn, list):
+                    isBasedOn = [isBasedOn]
+            for ind, identifier in enumerate(self.data['identifier']):
+                if not found_doi and identifier.get('propertyID') == 'DOI' \
+                    and identifier.get('value') == previous_doi:
+                    if keep_previous_doi:
+                        isBasedOn.append(
+                            {
+                                '@type': 'CreativeWork',
+                                'identifier': identifier
+                            }
+                        )
+                    self.data['identifier'][ind] = doi_entry
+                    found_doi = True
+                elif archive_entry and not found_archive and identifier.get('propertyID') == archive_type:
+                    identifier['value'] = new_archive_id
+                    found_archive = True
+            if not found_doi:
+                self.data['identifier'].append(doi_entry)
+            if archive_entry and not found_archive:
+                self.data['identifier'].append(archive_entry)
+            if keep_previous_doi and isBasedOn:
+                self.data['isBasedOn'] = isBasedOn
+        else:
+            self.data['identifier'] = [doi_entry]
+            if archive_entry:
+                self.data['identifier'].append(archive_entry)
+
+
     def to_json(self):
         """Dump metadata set as JSON-formatted string.
 

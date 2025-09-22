@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: If you use this software, please cite the paper describing it as below. Specific
+  versions of the software can additionally be referenced using individual DOIs.
+type: software
+title: Test software
+doi: 10.5281/zenodo.1234567
+version: 0.1.0
+authors:
+- given-names: One
+  family-names: Author
+identifiers:
+- description: The DOI for version 0.1.0 of this work.
+  type: doi
+  value: 10.5281/zenodo.1234567
+- type: doi
+  value: 10.5281/1234

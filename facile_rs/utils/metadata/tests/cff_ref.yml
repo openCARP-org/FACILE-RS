@@ -8,12 +8,10 @@ doi: 10.151.xxxxx
 version: 2.0.0
 date-released: 2024-04-18
 authors:
-- name: Marie Houillon
-  given-names: Marie
+- given-names: Marie
   family-names: Houillon
   orcid: https://orcid.org/0000-0002-6584-0233
-- name: Jochen Klar
-  given-names: Jochen
+- given-names: Jochen
   family-names: Klar
   orcid: https://orcid.org/0000-0002-5883-4273
 license: Apache-2.0

@@ -115,3 +115,133 @@ def test_sort_persons():
                 {'@type': 'Organization', 'name': 'First organization', 'additionalType': 'anotherType'},
             ]
     assert expected_result == metadata.data
+
+
+def test_update_identifier_new():
+    # Test adding a new DOI and archive ID when no previous identifiers exist
+    metadata = CodemetaMetadata()
+    metadata.data = {
+        'name': 'openCARP',
+        'version': '0.0.1'
+    }
+    metadata.update_identifier(new_doi='10.1234/new.doi', new_archive_id='zenodo123', archive_type='Zenodo',
+                               keep_previous_doi=False)
+    expected_result = {
+        'name': 'openCARP',
+        'version': '0.0.1',
+        '@id': 'https://doi.org/10.1234/new.doi',
+        'identifier': [
+            {
+                '@type': 'PropertyValue',
+                'propertyID': 'DOI',
+                'value': '10.1234/new.doi',
+                'description': 'The DOI for version 0.0.1 of this work'
+            },
+            {'@type': 'PropertyValue', 'propertyID': 'Zenodo', 'value': 'zenodo123'}
+        ]
+    }
+    assert metadata.data == expected_result
+
+def test_update_identifier_existing_overwrite():
+    # Test adding a new DOI and archive ID when previous identifiers exist, without keeping the previous DOI
+    metadata = CodemetaMetadata()
+    metadata.data = {
+        'name': 'openCARP',
+        'version': '0.0.2',
+        '@id': 'https://doi.org/10.1234/old.doi',
+        'identifier': [
+            {
+                '@type': 'PropertyValue',
+                'propertyID': 'DOI',
+                'value': '10.1234/additional.doi',
+                'description': 'The concept DOI of this work'
+            },
+            {
+                '@type': 'PropertyValue',
+                'propertyID': 'DOI',
+                'value': '10.1234/old.doi',
+                'description': 'The DOI for version 0.0.1 of this work'
+            },
+            {'@type': 'PropertyValue', 'propertyID': 'RADAR', 'value': 'radarold'}
+        ]
+    }
+    metadata.update_identifier(new_doi='10.5678/new.doi', new_archive_id='radarnew', archive_type='RADAR',
+                               keep_previous_doi=False)
+    expected_result = {
+        'name': 'openCARP',
+        'version': '0.0.2',
+        '@id': 'https://doi.org/10.5678/new.doi',
+        'identifier': [
+            {
+                '@type': 'PropertyValue',
+                'propertyID': 'DOI',
+                'value': '10.1234/additional.doi',
+                'description': 'The concept DOI of this work'
+            },
+            {
+                '@type': 'PropertyValue',
+                'propertyID': 'DOI',
+                'value': '10.5678/new.doi',
+                'description': 'The DOI for version 0.0.2 of this work'
+            },
+            {'@type': 'PropertyValue', 'propertyID': 'RADAR', 'value': 'radarnew'}
+        ]
+    }
+    assert metadata.data == expected_result
+
+def test_update_identifier_existing_keepdois():
+    # Test adding a new DOI, keeping previous DOIs
+    metadata = CodemetaMetadata()
+    metadata.data = {
+        'name': 'openCARP',
+        'version': '1.0.0',
+        '@id': 'https://doi.org/10.1234/old.doi',
+        'identifier': [
+            {
+                '@type': 'PropertyValue',
+                'propertyID': 'DOI',
+                'value': '10.1234/additional.doi',
+                'description': 'The concept DOI of this work'
+            },
+            {
+                '@type': 'PropertyValue',
+                'propertyID': 'DOI',
+                'value': '10.1234/old.doi',
+                'description': 'The DOI for version 0.0.1 of this work'
+            },
+            {'@type': 'PropertyValue', 'propertyID': 'RADAR', 'value': 'radarold'}
+        ]
+    }
+    metadata.update_identifier(new_doi='10.5678/new.doi', keep_previous_doi=True)
+    expected_result = {
+        'name': 'openCARP',
+        'version': '1.0.0',
+        '@id': 'https://doi.org/10.5678/new.doi',
+        'identifier': [
+            {
+                '@type': 'PropertyValue',
+                'propertyID': 'DOI',
+                'value': '10.1234/additional.doi',
+                'description': 'The concept DOI of this work'
+            },
+            {
+                '@type': 'PropertyValue',
+                'propertyID': 'DOI',
+                'value': '10.5678/new.doi',
+                'description': 'The DOI for version 1.0.0 of this work'
+            },
+            {'@type': 'PropertyValue', 'propertyID': 'RADAR', 'value': 'radarold'}
+        ],
+        'isBasedOn': [
+            {
+                '@type': 'CreativeWork',
+                'identifier': {
+                    '@type': 'PropertyValue',
+                    'propertyID': 'DOI',
+                    'value': '10.1234/old.doi',
+                    'description': 'The DOI for version 0.0.1 of this work'
+                }
+            }
+        ]
+    }
+    assert metadata.data == expected_result

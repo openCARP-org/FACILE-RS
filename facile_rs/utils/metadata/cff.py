@@ -69,14 +69,16 @@ class CffMetadata:
             for author in self.data['author']:
                 cff_author = {}
 
-                if 'name' in author:
-                    cff_author['name'] = author['name']
-
                 if 'givenName' in author:
                     cff_author['given-names'] = author['givenName']
+                    is_person = True
 
                 if 'familyName' in author:
                     cff_author['family-names'] = author['familyName']
+                    is_person = True
+
+                if not is_person and 'name' in author:
+                    cff_author['name'] = author['name']
 
                 if '@id' in author and author['@id'].startswith(self.orcid_prefix):
                     cff_author['orcid'] = author['@id']
@@ -152,39 +154,71 @@ class CffMetadata:
                     cff_json['preferred-citation']['authors'].append(cff_citation_author)
 
         # Case when identifier follows https://schema.org/identifier schema
-        if 'identifier' in self.data and isinstance(self.data['identifier'], dict):
-            cff_json['identifiers'] = [schema_org_identifier_to_cff(self.data['identifier'], cff_json)]
-        elif 'identifier' in self.data and isinstance(self.data['identifier'], list):
-            cff_json['identifiers'] = []
-            for identifier in self.data['identifier']:
-                cff_identifier = schema_org_identifier_to_cff(identifier, cff_json)
-                if cff_identifier:
-                    cff_json['identifiers'].append(cff_identifier)
+        if 'identifier' in self.data:
+            cff_identifiers = schema_org_identifiers_to_cff(self.data['identifier'])
+            if cff_identifiers:
+                cff_json['identifiers'] = schema_org_identifiers_to_cff(self.data['identifier'])
+
+        # isBasedOn schema.org property
+        # If the field contains entries with DOI identifiers, those are added
+        # as references in the CFF file
+        if 'isBasedOn' in self.data:
+            references = []
+            if isinstance(self.data['isBasedOn'], list):
+                isBasedOn_list = self.data['isBasedOn']
+            else:
+                isBasedOn_list = [self.data['isBasedOn']]
+            for isBasedOn_item in isBasedOn_list:
+                if 'identifier' in isBasedOn_item:
+                    cff_identifiers = schema_org_identifiers_to_cff(isBasedOn_item['identifier'])
+                    if cff_identifiers:
+                        references.append(
+                            {
+                                'identifiers': cff_identifiers
+                            }
+                        )
+            if references:
+                cff_json['references'] = references
 
         return yaml.dump(cff_json, allow_unicode=True, sort_keys=False, default_flow_style=False)
 
 
-def schema_org_identifier_to_cff(identifier, cff_json=None):
+def schema_org_identifier_to_cff(identifier):
     """ Converts schema.org identifier to CFF identifier.
     Supports only DOI identifiers for now. Returns an empty dict if identifier is not a schema.org-compliant
     DOI identifier.
 
     :param identifier: schema.org compliant DOI identifier
     :type identifier: dict
-    :param cff_json: dictionary containing CFF-formatted metadata
-    :type cff_json: dict, optional
     :return: CFF-formatted DOI identifier or empty dict if identifier was not compliant.
     :rtype: dict
     """
     cff_identifier = {}
-    if cff_json is None:
-        cff_json = {}
     if 'propertyID' in identifier and identifier['propertyID'] == "DOI":
-        if 'title' in cff_json and 'version' in cff_json:
-            cff_identifier['description'] = "This is the archived snapshot of version {} of {}".format(
-                cff_json['version'], cff_json['title']
-            )
+        if 'description' in identifier and isinstance(identifier['description'], str):
+            cff_identifier['description'] = identifier['description']
         cff_identifier['type'] = 'doi'
         if 'value' in identifier:
             cff_identifier['value'] = identifier['value']
     return cff_identifier
+
+def schema_org_identifiers_to_cff(identifiers):
+    """ Converts schema.org identifier field to CFF identifiers.
+    Supports only DOI identifiers for now.
+
+    :param identifier: schema.org compliant DOI identifier field
+    :type identifier: dict or list of dict
+    :return: CFF-formatted DOI identifier list
+    :rtype: list of dict
+    """
+    # Ensure to have a list of identifiers
+    if isinstance(identifiers, dict):
+        identifiers_list = [identifiers]
+    else:
+        identifiers_list = identifiers
+    cff_identifiers = []
+    for identifier in identifiers_list:
+        cff_identifier = schema_org_identifier_to_cff(identifier)
+        if cff_identifier:
+            cff_identifiers.append(cff_identifier)
+    return cff_identifiers

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## Unreleased
 
 ### Added
+- Add option `--keep-previous-doi` to `facile-rs radar prepare` and `facile-rs zenodo prepare`, to allow to keep DOI from previous version in codemeta.json.
+- New dependency: rich
+
+### Changed
+- If a DOI identifier in codemeta.json contains a description, this description is now rendered in the generated CFF file.
+- When converting author names from Codemeta to CFF, don't convert the field "name" if "familyName" or "givenName" is present.
 
 ### Changed
 - Version of dependency bagit updated from ~=1.7 to ~=1.9 (deprecated use of pkg_resources)
