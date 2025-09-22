@@ -73,3 +73,22 @@ def test_stdout(monkeypatch, capsys):
     with open(path.join(SCRIPT_DIR, 'cff_ref.cff')) as cff_ref:
         # remove the last newline character added by the print function
         assert captured[:-1] == cff_ref.read()
+
+
+def test_multiple_dois(monkeypatch, tmpdir):
+    """
+    Test handling of multiple DOIs in the CodeMeta file
+    """
+    codemeta_multiple_dois = path.join(METADATA_DIR, 'codemeta_multiple_dois.json')
+    output_cff = tmpdir.join('output.cff')
+    monkeypatch.setattr('sys.argv',
+                        [
+                            sys.argv[0],
+                            'cff',
+                            'create',
+                            '--codemeta-location', codemeta_multiple_dois,
+                            '--cff-path', str(output_cff)
+                        ])
+    main()
+    with open(path.join(SCRIPT_DIR, 'cff_ref_multiple_dois.cff')) as cff_ref:
+        assert output_cff.read() == cff_ref.read()

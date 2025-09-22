@@ -42,9 +42,14 @@ def create_parser(add_help=True):
     parser.add_argument('--zenodo-version-update', dest='ZENODO_VERSION_UPDATE', default=None,
                         help='Enable Zenodo version update. Can be "codemeta" or a Zenodo identifier. '
                         'If omitted, a new Zenodo dataset is created without versioning. '
-                        'If set to "codemeta", a Zenodo identifier is searched in the CodeMeta file, and a new version is '
-                        'created from it (if found). '
-                        'Any other value is considered as a Zenodo identifier: a new version will be created from it. ')
+                        'If set to "codemeta", a Zenodo identifier is searched in the CodeMeta file, and a new '
+                        'version is created from it (if found). '
+                        'Any other value is considered as a Zenodo identifier: a new version will be created from it. '
+                        )
+    parser.add_argument('--keep-previous-doi', action='store_true', dest='KEEP_PREVIOUS_DOI',
+                        help='When creating a new version, keep the previous DOI in the Codemeta file, '
+                        'in the field "isBasedOn". '
+                        'By default, the previous DOI is removed.')
     parser.add_argument('--dry', action='store_true', dest='DRY',
                         help='Perform a dry run, do not upload anything.')
     parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
@@ -82,41 +87,16 @@ def main(args):
 
     if not args.DRY:
         # create Zenodo dataset
-        dataset_id = create_zenodo_dataset(args.ZENODO_URL, args.ZENODO_TOKEN, zenodo_dict, previous_version=old_zenodo_id)
+        dataset_id = create_zenodo_dataset(
+            args.ZENODO_URL, args.ZENODO_TOKEN, zenodo_dict, previous_version=old_zenodo_id)
         dataset = prepare_zenodo_dataset(args.ZENODO_URL, dataset_id, args.ZENODO_TOKEN)
 
         doi = dataset.get('metadata', {}).get('doi', {})
-        doi_url = 'https://doi.org/' + doi
 
         # Update Codemeta file with DOI and Zenodo ID
         if args.CODEMETA_LOCATION:
-            codemeta.data['@id'] = doi_url
-            doi_entry = {
-                '@type': 'PropertyValue',
-                'propertyID': 'DOI',
-                'value': doi
-            }
-            zenodo_entry = {
-                '@type': 'PropertyValue',
-                'propertyID': 'Zenodo',
-                'value': dataset_id
-            }
-            if 'identifier' in codemeta.data and isinstance(codemeta.data['identifier'], list):
-                found_doi = False
-                found_zenodo = False
-                for identifier in codemeta.data['identifier']:
-                    if identifier.get('propertyID') == 'DOI':
-                        identifier['value'] = doi
-                        found_doi = True
-                    elif identifier.get('propertyID') == 'Zenodo':
-                        identifier['value'] = dataset_id
-                        found_zenodo = True
-                if not found_doi:
-                    codemeta.data['identifier'].append(doi_entry)
-                if not found_zenodo:
-                    codemeta.data['identifier'].append(zenodo_entry)
-            else:
-                codemeta.data['identifier'] = [doi_entry, zenodo_entry]
+            codemeta.update_identifier(new_doi=doi, new_archive_id=dataset_id, archive_type='Zenodo',
+                                       keep_previous_doi=args.KEEP_PREVIOUS_DOI)
 
             Path(args.CODEMETA_LOCATION).expanduser().write_text(codemeta.to_json())
         else:

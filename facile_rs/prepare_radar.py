@@ -50,6 +50,10 @@ def create_parser(add_help=True):
                         help='Email for the RADAR metadata.')
     parser.add_argument('--radar-backlink', dest='RADAR_BACKLINK', required=True,
                         help='Backlink for the RADAR metadata.')
+    parser.add_argument('--keep-previous-doi', action='store_true', dest='KEEP_PREVIOUS_DOI',
+                        help='When creating a new version, keep the previous DOI in the Codemeta file, '
+                        'in the field "isBasedOn". '
+                        'By default, the previous DOI is removed.')
     parser.add_argument('--dry', action='store_true', dest='DRY',
                         help='Perform a dry run, do not upload anything.')
     parser.add_argument('--log-level', dest='LOG_LEVEL', default='WARN',
@@ -81,36 +85,10 @@ def main(args):
         dataset = prepare_radar_dataset(args.RADAR_URL, dataset_id, headers)
 
         doi = dataset.get('descriptiveMetadata', {}).get('identifier', {}).get('value')
-        doi_url = 'https://doi.org/' + doi
 
         if args.CODEMETA_LOCATION:
-            codemeta.data['@id'] = doi_url
-            doi_entry = {
-                '@type': 'PropertyValue',
-                'propertyID': 'DOI',
-                'value': doi
-            }
-            radar_entry = {
-                '@type': 'PropertyValue',
-                'propertyID': 'RADAR',
-                'value': dataset_id
-            }
-            if 'identifier' in codemeta.data and isinstance(codemeta.data['identifier'], list):
-                found_doi = False
-                found_radar = False
-                for identifier in codemeta.data['identifier']:
-                    if identifier.get('propertyID') == 'DOI':
-                        identifier['value'] = doi
-                        found_doi = True
-                    elif identifier.get('propertyID') == 'RADAR':
-                        identifier['value'] = dataset_id
-                        found_radar = True
-                if not found_doi:
-                    codemeta.data['identifier'].append(doi_entry)
-                if not found_radar:
-                    codemeta.data['identifier'].append(radar_entry)
-            else:
-                codemeta.data['identifier'] = [doi_entry, radar_entry]
+            codemeta.update_identifier(new_doi=doi, new_archive_id=dataset_id, archive_type='RADAR',
+                                       keep_previous_doi=args.KEEP_PREVIOUS_DOI)
 
             Path(args.CODEMETA_LOCATION).expanduser().write_text(codemeta.to_json())
         else:
