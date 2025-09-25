@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 - Version of dependency bagit updated from ~=1.7 to ~=1.9 (deprecated use of pkg_resources)
+- Use version 9.2 of RADAR metadata schema
 
 ## v3.3.0
 
