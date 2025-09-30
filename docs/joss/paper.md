@@ -1,5 +1,5 @@
 ---
-title: 'FACILE-RS: archival and long-term preservation of research software repositories made easy'
+title: 'FACILE-RS: archiving and long-term preservation of research software repositories made easy'
 tags:
   - Python
   - FAIR
@@ -53,7 +53,7 @@ docker run --rm \
 
 # Summary
 
-The Python package FACILE-RS (Findability and Accessibility through Continuous Integration with Less Effort for Research Software) facilitates the archival and long-term preservation of research software repositories. It consists of a set of scripts that simplify the maintenance of software metadata by automating its generation and synchronization in various formats from a single manually maintained metadata file. FACILE-RS also makes it easier to publish and archive software releases according to the Open Science paradigm and the FAIR (Findable, Accessible, Interoperable, Reusable) principles for Research Software by offering tools to automate the creation of releases and the upload to persistent research data repositories.
+The Python package FACILE-RS (Findability and Accessibility through Continuous Integration with Less Effort for Research Software) facilitates the archiving and long-term preservation of research software repositories. It consists of a set of scripts that simplify the maintenance of software metadata by automating its generation and synchronization in various formats from a single manually maintained metadata file. FACILE-RS also makes it easier to publish and archive software releases according to the Open Science paradigm and the FAIR (Findable, Accessible, Interoperable, Reusable) principles for Research Software by offering tools to automate the creation of releases and the upload to persistent research data repositories.
 
 In particular, FACILE-RS automates:
 
@@ -135,7 +135,7 @@ For more information on the implementation of FACILE-RS automated workflows, we 
 
 # Conclusion
 
-In this paper, we present FACILE-RS, a tool to facilitate research software metadata management and archival. FACILE-RS helps researchers follow the FAIR principles for research software through a set of scripts, which can be easily deployed within CI/CD workflows.
+In this paper, we present FACILE-RS, a tool to facilitate research software metadata management and archiving. FACILE-RS helps researchers follow the FAIR principles for research software through a set of scripts, which can be easily deployed within CI/CD workflows.
 
 # Acknowledgements
 
