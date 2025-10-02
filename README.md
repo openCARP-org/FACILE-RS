@@ -1,5 +1,7 @@
 # FACILE-RS
 
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.07330/status.svg)](https://doi.org/10.21105/joss.07330)
+
 This package (previously known as openCARP-CI) contains a set of Python scripts which can be used to perform tasks around the archival and long term preservation of software repositories. In particular, it can be used to:
 
 * create a release in GitLab using the GitLab API,
