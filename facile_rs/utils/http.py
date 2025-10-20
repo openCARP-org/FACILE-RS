@@ -97,3 +97,14 @@ def fetch_json(location):
     response = requests.get(location, headers={'Accept': 'application/json'})
     response.raise_for_status()
     return response.json()
+
+
+def is_remote(location):
+    """
+    Check if a location is remote
+
+    :param location: URL to the JSON data
+    :return: bool
+    """
+    parsed_url = urlparse(location)
+    return bool(parsed_url.scheme)
