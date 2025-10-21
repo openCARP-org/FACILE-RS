@@ -26,6 +26,8 @@ from pathlib import Path
 from rich import print
 
 from .utils import cli
+from .utils.exceptions import ParserError
+from .utils.http import is_remote
 from .utils.metadata import CodemetaMetadata, ZenodoMetadata
 from .utils.zenodo import create_zenodo_dataset, prepare_zenodo_dataset
 
@@ -60,8 +62,10 @@ def create_parser(add_help=True):
 
 
 def main(args):
-
     if args.CODEMETA_LOCATION:
+        if is_remote(args.CODEMETA_LOCATION):
+            raise ParserError(f'Location {args.CODEMETA_LOCATION} is not a local file.')
+
         codemeta = CodemetaMetadata()
         codemeta.fetch(args.CODEMETA_LOCATION)
         name = '{name} ({version}, in preparation)'.format(**codemeta.data)

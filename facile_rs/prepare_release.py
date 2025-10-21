@@ -18,6 +18,8 @@ from datetime import date
 from pathlib import Path
 
 from .utils import cli
+from .utils.exceptions import ParserError
+from .utils.http import is_remote
 from .utils.metadata import CodemetaMetadata
 
 
@@ -38,6 +40,9 @@ def create_parser(add_help=True):
 
 
 def main(args):
+    if is_remote(args.CODEMETA_LOCATION):
+        raise ParserError(f'Location {args.CODEMETA_LOCATION} is not a local file.')
+
     codemeta = CodemetaMetadata()
     codemeta.fetch(args.CODEMETA_LOCATION)
 
