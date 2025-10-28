@@ -233,8 +233,7 @@ def setup_env():
 def setup_logs(log_level, log_file):
     log_level = log_level.upper()
     if log_file is None:
-        logging.basicConfig(level=log_level, format='[%(asctime)s] %(levelname)s %(name)s: %(message)s',
-                            handlers=[RichHandler()])
+        logging.basicConfig(level=log_level, format='%(message)s', handlers=[RichHandler()])
     else:
         logging.basicConfig(level=log_level, format='[%(asctime)s] %(levelname)s %(name)s: %(message)s',
                             filename=Path(log_file).expanduser().as_posix())
