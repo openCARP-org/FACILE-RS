@@ -84,7 +84,7 @@ def main(args):
 
         for metadata in catalog_metadata:
             metadata['slug'] = slugify(metadata['title'])
-            metadata['doi_url'] = f'https://doi.org/{doi}'
+            metadata['doi_url'] = f"https://doi.org/{metadata['doi']}"
 
             md_path = page_path.parent / metadata['slug'] / 'catalog-item.md'
 
