@@ -36,6 +36,7 @@ dependencies = [
     "pypandoc~=1.6",
     "python-dotenv~=1.1",
     "python-frontmatter~=1.1",
+    "python-slugify~=8.0.4",
     "PyYaml~=6.0.2",
     "requests~=2.23",
     "python-resize-image~=1.1.20",
